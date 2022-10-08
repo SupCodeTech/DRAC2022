@@ -27,7 +27,7 @@ Preparation of the dataset catalog
 │   │   ├── pre_train.txt
 ```
 
-Configure the semi-supervised learning environment
+## Configure the semi-supervised learning environment
 
 ```shell
 nvcc -V
@@ -40,14 +40,13 @@ cd DRAC2022/Se_sup/
 # Install MMSelfSup from source
 pip install -e .
 ```
-# Running the example script of different MAE algorithm for pre-training task
+## Running the example script of different MAE algorithm for pre-training task
 Usage: 
 ```shell
 python tools/train.py configs/selfsup/mae/mae_vit-base-p16_8xb512-coslr-400e_drac2022.py 
 ```
 
-Extract the weight of MAE
-
+## Extract the weight of pre-training MAE
 Usage: 
 ```shell
 python tools/model_converters/extract_backbone_weights.py \
@@ -127,7 +126,7 @@ The data directory for the semantic segmentation task
 │   ├── Testset
 ```
 
-Semantic segmentation environment configuration
+## Semantic segmentation environment configuration
 
 ```shell
 # Check nvcc version
@@ -143,7 +142,7 @@ cd DRAC2022
 pip install -e .
 ```
 
-# Running the example script of different sub-algorithm in training Mask A:
+## Running the example script of different sub-algorithm in training Mask A:
 Usage:
 ```shell
 python tools/train.py MCS_DRNet/(sub-algorithm)_Task_1_Mask_A_(640x640/1024x1024)
@@ -156,7 +155,7 @@ Usage:
 ```shell
 python tools/train.py MCS_DRNet/M_Task_1_Mask_A_640x640
 ```
-# Running the example script of sub-algorithm C in training Mask B:
+## Running the example script of sub-algorithm C in training Mask B:
 
 Usage:
 ```shell
