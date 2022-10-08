@@ -9,6 +9,10 @@ People with diabetes are more likely to develop retinal lesions than healthy peo
 ![Figure1](https://user-images.githubusercontent.com/111235455/194624992-cd09e471-d550-4e89-9e3f-3c152463fa0e.jpg)
 
 
+```shell
+git clone https://github.com/SupCodeTech/DRAC2022.git
+```
+
 Stage 1: Pre-task training
 
 Preparation of the dataset catalog
@@ -22,7 +26,7 @@ Preparation of the dataset catalog
 │   │   ├── pre_train.txt
 ```
 
-Configure the self-supervised learning environment
+Configure the semi-supervised learning environment
 
 ```shell
 nvcc -V
@@ -31,8 +35,7 @@ gcc --version
 pip install openmim
 mim install mmcv-full
 pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.10/index.html
-git clone https://github.com/SupCodeTech/DRAC2022.git
-cd DRAC2022//
+cd DRAC2022/Se_sup/
 # Install MMSelfSup from source
 pip install -e .
 ```
@@ -51,7 +54,7 @@ bash python tools/model_converters/extract_backbone_weights.py \
 
 Stage 2: Semantic segmentation
 
-Preparation of a semantically segmented dataset catalog
+The data directory for the semantic segmentation task
 
 ```none
 ├── DRAC2022_dataset
@@ -133,11 +136,8 @@ pip install torch==1.12.0 torchvision --extra-index-url https://download.pytorch
 # Install MMCV
 pip install openmim
 mim install mmcv-full==1.6.0
-# !rm -rf mmsegmentation
-# !git clone https://github.com/open-mmlab/mmsegmentation.git 
-cd /content/drive/MyDrive/mmsegmentation-0.24.1
+cd DRAC2022
 pip install -e .
-cd /content/drive/MyDrive/mmsegmentation-0.24.1
 ```
 
 
