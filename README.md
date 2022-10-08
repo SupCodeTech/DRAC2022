@@ -1,4 +1,3 @@
-# DRAC2022
 # DRAC2022 DR Segmentation
 The project is under construction
 ## Abstract
