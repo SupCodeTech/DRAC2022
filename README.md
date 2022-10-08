@@ -14,7 +14,7 @@ Stage 1: Pre-task training
 Preparation of the dataset catalog
 
 ```none
-├── Pre_Task_Training
+├── Se_sup
 │   ├── Data
 │   │   ├── pre_training_data
 │   │   │   ├── 001.jpg
