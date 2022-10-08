@@ -13,7 +13,7 @@ People with diabetes are more likely to develop retinal lesions than healthy peo
 git clone https://github.com/SupCodeTech/DRAC2022.git
 ```
 
-Stage 1: Pre-task training
+# Stage 1: Pre-task training
 
 Preparation of the dataset catalog
 
@@ -39,20 +39,21 @@ cd DRAC2022/Se_sup/
 # Install MMSelfSup from source
 pip install -e .
 ```
-
+Usage: 
 ```shell
-bash python tools/train.py configs/selfsup/mae/mae_vit-base-p16_8xb512-coslr-400e_drac2022.py 
+python tools/train.py configs/selfsup/mae/mae_vit-base-p16_8xb512-coslr-400e_drac2022.py 
 ```
 
-Extract weight
+Extract the weight of MAE
 
+Usage: 
 ```shell
-bash python tools/model_converters/extract_backbone_weights.py \
+python tools/model_converters/extract_backbone_weights.py \
   Pre_training_output_dirs/epoch_1600.pth \
   Pre_training_output_dirs/Pre_training_weight_backbone.pth
 ```
 
-Stage 2: Semantic segmentation
+# Stage 2: Semantic segmentation
 
 The data directory for the semantic segmentation task
 
@@ -140,8 +141,25 @@ cd DRAC2022
 pip install -e .
 ```
 
+# Running the example script of different sub-algorithm in training Mask A:
+Usage:
+```shell
+python tools/train.py MCS_DRNet/(sub-algorithm)_Task_1_Mask_A_(640x640/1024x1024)
+```
 
+The sub-algorithm contains three values: `M`, `C`, and `S`. The resolution `1024x1024` is unique to the `S` algorithm.
+For example, we want to run the subalgorithm `M`.
 
+Usage:
+```shell
+python tools/train.py MCS_DRNet/M_Task_1_Mask_A_640x640
+```
+# Running the example script of sub-algorithm C in training Mask B:
+
+Usage:
+```shell
+python tools/train.py MCS_DRNet/C_Task_1_Mask_B_640x640
+```
 
 
 
