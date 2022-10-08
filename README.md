@@ -40,6 +40,7 @@ cd DRAC2022/Se_sup/
 # Install MMSelfSup from source
 pip install -e .
 ```
+# Running the example script of different MAE algorithm for pre-training task
 Usage: 
 ```shell
 python tools/train.py configs/selfsup/mae/mae_vit-base-p16_8xb512-coslr-400e_drac2022.py 
