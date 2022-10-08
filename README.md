@@ -53,7 +53,6 @@ Stage 2: Semantic segmentation
 Preparation of a semantically segmented dataset catalog
 
 ```none
-DRAC2022_Task1_Segmentation
 ├── DRAC2022_dataset
 │   ├── Segmentation
 │   │   ├── Training
