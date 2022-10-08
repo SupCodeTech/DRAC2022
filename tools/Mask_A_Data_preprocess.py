@@ -13,6 +13,7 @@ from PIL import Image
 import tensorflow as tf
 import pandas as pd
 import shutil
+import os.path
 
 Resolution = 1024
 
@@ -29,10 +30,7 @@ PALETTE = [[20, 20, 20], [30, 30, 30], [40, 40, 40]]
 
 spilt = 0
 
-import cv2
-import os.path
-import os
-import numpy as np
+
  
  
 def img_resize(img):
