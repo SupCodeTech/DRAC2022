@@ -14,7 +14,7 @@ People with diabetes are more likely to develop retinal lesions than healthy peo
 git clone https://github.com/SupCodeTech/DRAC2022.git
 ```
 
-# Stage Ⅰ: Pre-task training
+# Stage I: Pre-task training
 
 Preparation of the dataset catalog
 
@@ -54,7 +54,7 @@ python tools/model_converters/extract_backbone_weights.py \
   Pre_training_output_dirs/Pre_training_weight_backbone.pth
 ```
 
-# Stage Ⅱ: Semantic segmentation
+# Stage II: Semantic segmentation
 
 The data directory for the semantic segmentation task
 
