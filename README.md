@@ -31,7 +31,8 @@ gcc --version
 pip install openmim
 mim install mmcv-full
 pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.10/index.html
-cd /content/drive/MyDrive/mmselfsup/
+git clone https://github.com/SupCodeTech/DRAC2022.git
+cd DRAC2022//
 # Install MMSelfSup from source
 pip install -e .
 ```
