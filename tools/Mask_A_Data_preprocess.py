@@ -27,10 +27,10 @@ Resolution = 1024
 
 img_dir = 'DRAC2022_dataset/A._Segmentation/1._Original Images/a._Training Set'
 groundtruth = 'DRAC2022_dataset/A._Segmentation/2._Groundtruths/a._Training Set'
-img_dir_1 = '1._Intraretinal Microvascular Abnormalities'
+img_dir_1 = '1._Intraretinal_Microvascular_Abnormalities'
 img_dir_3 = '3._Neovascularization'
 
-palette = [[20, 20, 20], [30, 30, 30], [40, 40, 40]]
+palette = [[125, 125, 125], [20, 10, 130], [140, 140, 40], [140, 40, 60]]
 
 
 import cv2
@@ -52,8 +52,8 @@ def img_resize(img):
  
 for file in mmcv.scandir(img_dir, suffix='.png'):
 
-  image_tensor_1 = np.zeros(1048576).reshape((Resolution, Resolution))
-  image_tensor_3 = np.zeros(1048576).reshape((Resolution, Resolution))
+  seg_map_1 = np.zeros(1048576).reshape((Resolution, Resolution))
+  seg_map_3 = np.zeros(1048576).reshape((Resolution, Resolution))
   
   img_1 = os.path.join(osp.join(groundtruth, img_dir_1), file)
   img_3 = os.path.join(osp.join(groundtruth, img_dir_3), file)
@@ -63,17 +63,17 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
     for i in range(Resolution):
       for j in range(Resolution):
         if image_tensor_1[i][j] > 0:
-          image_tensor_1[i][j] = 1 
+          seg_map_1[i][j] = 1 
 
   if os.path.exists(img_3): 
     image_tensor_3 = cv2.imread(img_3, 2)
     for i in range(Resolution):
       for j in range(Resolution):
         if image_tensor_3[i][j] > 0:
-          image_tensor_3[i][j] = 2 
+          seg_map_3[i][j] = 2 
 
-  seg_map = image_tensor_1 + image_tensor_3
-  
+  seg_map = seg_map_1 + seg_map_3
+
   # 1024
   seg_img_1024_ = Image.fromarray(seg_map).convert('P')
   seg_img_1024 = Image.fromarray(seg_map).convert('P')
@@ -94,11 +94,14 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   seg_map_rotate_1024_270 = seg_img_1024_.rotate(270, expand=1)
   seg_map_rotate_1024_270.putpalette(np.array(palette, dtype=np.uint8))
 
-  # 640 
-  seg_map_640 = img_resize(seg_map)
-  seg_map_640_ = img_resize(seg_map)
+  # 640
+  seg_map_640 = seg_map_1 + seg_map_3
+  seg_map_640_ = seg_map_1 + seg_map_3
+
   seg_map_640 = Image.fromarray(seg_map_640).convert('P')
   seg_map_640_ = Image.fromarray(seg_map_640_).convert('P')
+  seg_map_640.resize((640, 640), Image.ANTIALIAS)
+  seg_map_640_.resize((640, 640), Image.ANTIALIAS)
   seg_map_640_.putpalette(np.array(palette, dtype=np.uint8))
 
   seg_map_rotate_640_90 = seg_map_640.rotate(90, expand=1)
@@ -169,25 +172,25 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   img_640_path = os.path.exists(img_640_path)
   if not img_640_path:
         os.makedirs(img_640_path)
-  image_640 = cv2.imread(img_dir + '/' + file, 1)
-  image_640 = img_resize(image_640)
-  image_640 = Image.fromarray(image_640).convert('RGB')
+  Original_image_640 = cv2.imread(img_dir + '/' + file, 1)
+  Original_image_640 = Image.fromarray(Original_image_640).convert('RGB')
+  Original_image_640.resize((640, 640), Image.ANTIALIAS)
   # raw 640 image saving
-  image_640.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", file.replace('.png','.jpg')))
+  Original_image_640.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", file.replace('.png','.jpg')))
 
   # Flip horizontal
-  image_640_flip_left_right = image_640.transpose(Image.FLIP_LEFT_RIGHT)
+  image_640_flip_left_right = Original_image_640.transpose(Image.FLIP_LEFT_RIGHT)
   image_640_flip_left_right.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "00_" + file.replace('.png','.jpg')))
   # Flip vertical
-  image_640_flip_top_bottom = image_640.transpose(Image.FLIP_TOP_BOTTOM)
+  image_640_flip_top_bottom = Original_image_640.transpose(Image.FLIP_TOP_BOTTOM)
   image_640_flip_top_bottom.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "11_" + file.replace('.png','.jpg')))
 
   # rotate 90 640 raw image saving
-  image_640_90 = image_640.rotate(90, expand=1)
+  image_640_90 = Original_image_640.rotate(90, expand=1)
   image_640_90.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "90_" +file.replace('.png','.jpg')))
   # rotate 180 640 raw image saving
-  image_640_180 = image_640.rotate(180, expand=1)
+  image_640_180 = Original_image_640.rotate(180, expand=1)
   image_640_180.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "180_" +file.replace('.png','.jpg')))
   # rotate 270 640 raw image saving
-  image_640_270 = image_640.rotate(270, expand=1)
+  image_640_270 = Original_image_640.rotate(270, expand=1)
   image_640_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "270_" +file.replace('.png','.jpg')))
