@@ -52,27 +52,27 @@ def img_resize(img):
  
 for file in mmcv.scandir(img_dir, suffix='.png'):
 
-  seg_map_1 = np.zeros(1048576).reshape((Resolution, Resolution))
-  seg_map_3 = np.zeros(1048576).reshape((Resolution, Resolution))
+  image_tensor_1 = np.zeros(1048576).reshape((Resolution, Resolution))
+  image_tensor_3 = np.zeros(1048576).reshape((Resolution, Resolution))
   
-  img_1 = os.path.join(osp.join(groundtruth, img_dir_1) + file)
-  img_3 = os.path.join(osp.join(groundtruth, img_dir_3) + file)
+  img_1 = os.path.join(osp.join(groundtruth, img_dir_1), file)
+  img_3 = os.path.join(osp.join(groundtruth, img_dir_3), file)
 
   if os.path.exists(img_1): 
     image_tensor_1 = cv2.imread(img_1, 2)
     for i in range(Resolution):
       for j in range(Resolution):
         if image_tensor_1[i][j] > 0:
-          seg_map_1[i][j] = 1 
+          image_tensor_1[i][j] = 1 
 
   if os.path.exists(img_3): 
     image_tensor_3 = cv2.imread(img_3, 2)
     for i in range(Resolution):
       for j in range(Resolution):
         if image_tensor_3[i][j] > 0:
-          seg_map_3[i][j] = 2 
+          image_tensor_3[i][j] = 2 
 
-  seg_map = seg_map_1 + seg_map_3
+  seg_map = image_tensor_1 + image_tensor_3
   
   # 1024
   seg_img_1024_ = Image.fromarray(seg_map).convert('P')
@@ -169,7 +169,6 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   img_640_path = os.path.exists(img_640_path)
   if not img_640_path:
         os.makedirs(img_640_path)
-        
   image_640 = cv2.imread(img_dir + '/' + file, 1)
   image_640 = img_resize(image_640)
   image_640 = Image.fromarray(image_640).convert('RGB')
@@ -178,7 +177,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
 
   # Flip horizontal
   image_640_flip_left_right = image_640.transpose(Image.FLIP_LEFT_RIGHT)
-  image_1024_flip_left_right.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "00_" + file.replace('.png','.jpg')))
+  image_640_flip_left_right.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "00_" + file.replace('.png','.jpg')))
   # Flip vertical
   image_640_flip_top_bottom = image_640.transpose(Image.FLIP_TOP_BOTTOM)
   image_640_flip_top_bottom.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "11_" + file.replace('.png','.jpg')))
