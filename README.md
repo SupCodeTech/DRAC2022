@@ -161,7 +161,7 @@ python tools/train.py configs/MCS_DRNet/M_Task_1_Mask_A_640x640.py
 
 Usage:
 ```shell
-python tools/train.py configs/MCS_DRNet/C_Task_1_Mask_A_640x640.py
+python tools/train.py configs/MCS_DRNet/C_Task_1_Mask_B_640x640.py
 ```
 
 
