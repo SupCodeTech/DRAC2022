@@ -147,7 +147,7 @@ pip install -e .
 ## Running the example script of different sub-algorithm in training Mask A:
 Usage:
 ```shell
-python tools/train.py MCS_DRNet/(sub-algorithm)_Task_1_Mask_A_(640x640/1024x1024)
+python tools/train.py configs/MCS_DRNet/(sub-algorithm)_Task_1_Mask_A_(640x640/1024x1024).py
 ```
 
 The sub-algorithm contains three values: `M`, `C`, and `S`. The resolution `1024x1024` is unique to the `S` algorithm.
@@ -155,13 +155,13 @@ For example, we want to run the subalgorithm `M`.
 
 Usage:
 ```shell
-python tools/train.py MCS_DRNet/M_Task_1_Mask_A_640x640
+python tools/train.py configs/MCS_DRNet/M_Task_1_Mask_A_640x640.py
 ```
 ## Running the example script of sub-algorithm C in training Mask B:
 
 Usage:
 ```shell
-python tools/train.py MCS_DRNet/C_Task_1_Mask_B_640x640
+python tools/train.py configs/MCS_DRNet/C_Task_1_Mask_A_640x640.py
 ```
 
 
