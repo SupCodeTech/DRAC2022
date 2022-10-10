@@ -30,7 +30,6 @@ groundtruth = 'DRAC2022_dataset/A._Segmentation/2._Groundtruths/a._Training Set'
 img_dir_1 = '1._Intraretinal Microvascular Abnormalities'
 img_dir_3 = '3._Neovascularization'
 
-CLASSES = ('Background', 'Intraretinal_microvascular_abnormals', 'Neovascularization')
 palette = [[20, 20, 20], [30, 30, 30], [40, 40, 40]]
 
 spilt = 0
@@ -92,68 +91,68 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
 
   # 640 
   seg_map_640 = img_resize(seg_map)
-  seg_map_640_ = Image.fromarray(seg_map_640).convert('P')
+  seg_map_640_ = img_resize(seg_map)
+  seg_map_640 = Image.fromarray(seg_map_640).convert('P')
+  seg_map_640_ = Image.fromarray(seg_map_640_).convert('P')
   seg_map_640_.putpalette(np.array(palette, dtype=np.uint8))
 
   seg_map_rotate_640_90 = seg_map_640.rotate(90, expand=1)
-  seg_map_rotate_640_90 = Image.fromarray(seg_map_rotate_640_90).convert('P')
   seg_map_rotate_640_90.putpalette(np.array(palette, dtype=np.uint8))
 
   seg_map_rotate_640_180 = seg_map_640.rotate(180, expand=1)
-  seg_map_rotate_640_180 = Image.fromarray(seg_map_rotate_640_180).convert('P')
   seg_map_rotate_640_180.putpalette(np.array(palette, dtype=np.uint8))
 
   seg_map_rotate_640_270 = seg_map_640.rotate(270, expand=1)
-  seg_map_rotate_640_270 = Image.fromarray(seg_map_rotate_640_270).convert('P')
   seg_map_rotate_640_270.putpalette(np.array(palette, dtype=np.uint8))
 
   spilt = spilt + 1
 
-  os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks")
+  # os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks")
   seg_img_1024.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", file))
   # rotate 90 640 raw mask saving
-  seg_map_rotate_1024_90.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", "/90_" + file))
+  seg_map_rotate_1024_90.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", "90_" + file))
   # rotate 180 640 raw mask saving
-  seg_map_rotate_1024_180.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", "/180_" + file))
+  seg_map_rotate_1024_180.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", "180_" + file))
   # rotate 270 640 raw mask saving
-  seg_map_rotate_1024_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", "/270_" + file))
+  seg_map_rotate_1024_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", "270_" + file))
     
-  os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images")
-  image_1024 = cv2.imread(img_dir + file, 1)
+  # os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images")
+  image_1024 = cv2.imread(img_dir + '/' + file, 1)
   image_1024_ = Image.fromarray(image_1024).convert('RGB')
   # raw 1024 image saving
   image_1024_.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images", file.replace('.png','.jpg')))
   # rotate 90 1024 raw image saving
-  image_1024_90 = image_1024.rotate(90, expand=1)
-  image_1024_90.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images", "/90_" +file.replace('.png','.jpg')))
+  image_1024_90 = image_1024_.rotate(90, expand=1)
+  image_1024_90.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images", "90_" +file.replace('.png','.jpg')))
   # rotate 180 1024 raw image saving
-  image_1024_180 = image_1024.rotate(180, expand=1)
-  image_1024_180.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images", "/180_" +file.replace('.png','.jpg')))
+  image_1024_180 = image_1024_.rotate(180, expand=1)
+  image_1024_180.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images", "180_" +file.replace('.png','.jpg')))
   # rotate 270 1024 raw image saving
-  image_1024_270 = image_1024.rotate(270, expand=1)
-  image_1024_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images", "/270_" +file.replace('.png','.jpg')))
+  image_1024_270 = image_1024_.rotate(270, expand=1)
+  image_1024_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images", "270_" +file.replace('.png','.jpg')))
 
-  os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/640/Masks")
+  # os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/640/Masks")
   # raw 640 mask saving
   seg_map_640_.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", file))
   # rotate 90 640 raw mask saving
-  seg_map_rotate_640_90.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", "/90_" + file))
+  seg_map_rotate_640_90.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", "90_" + file))
   # rotate 180 640 raw mask saving
-  seg_map_rotate_640_180.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", "/180_" + file))
+  seg_map_rotate_640_180.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", "180_" + file))
   # rotate 270 640 raw mask saving
-  seg_map_rotate_640_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", "/270_" + file))
+  seg_map_rotate_640_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", "270_" + file))
 
-  image_640 = cv2.imread(img_dir + file, 1)
+  image_640 = cv2.imread(img_dir + '/' + file, 1)
+  image_640 = img_resize(image_640)
   image_640 = Image.fromarray(image_640).convert('RGB')
-  os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images")
+  # os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images")
   # raw 640 image saving
   image_640.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", file.replace('.png','.jpg')))
   # rotate 90 640 raw image saving
   image_640_90 = image_640.rotate(90, expand=1)
-  image_640_90.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "/90_" +file.replace('.png','.jpg')))
+  image_640_90.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "90_" +file.replace('.png','.jpg')))
   # rotate 180 640 raw image saving
   image_640_180 = image_640.rotate(180, expand=1)
-  image_640_180.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "/180_" +file.replace('.png','.jpg')))
+  image_640_180.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "180_" +file.replace('.png','.jpg')))
   # rotate 270 640 raw image saving
   image_640_270 = image_640.rotate(270, expand=1)
-  image_640_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "/270_" +file.replace('.png','.jpg')))
+  image_640_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "270_" +file.replace('.png','.jpg')))
