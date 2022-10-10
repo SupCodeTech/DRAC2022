@@ -140,7 +140,7 @@ pip install torch==1.12.0 torchvision --extra-index-url https://download.pytorch
 # Install MMCV
 pip install openmim
 mim install mmcv-full==1.6.0
-cd DRAC2022
+cd ./DRAC2022
 pip install -e .
 ```
 
