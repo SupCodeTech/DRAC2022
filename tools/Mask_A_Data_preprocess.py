@@ -1,3 +1,4 @@
+%cd /content/DRAC2022
 import os.path as osp
 import numpy as np
 from PIL import Image
@@ -154,19 +155,18 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   # rotate 270 1024 raw image saving
   image_1024_270 = image_1024_.rotate(270, expand=1)
   image_1024_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images", "270_" +file.replace('.png','.jpg')))
-
-  seg_640_path = "./DRAC2022_dataset/Segmentation/Training/A/640/Masks"
+  seg_640_path = "./DRAC2022_dataset/Segmentation/Training/A/640/Original_images"
   seg_640_path_folder = os.path.exists(seg_640_path)
   if not seg_640_path_folder:
-        os.makedirs(seg_640_path)
+    os.makedirs(seg_640_path)
   # raw 640 mask saving
   seg_map_640_.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", file))
    # Flip horizontal
-  image_640_flip_left_right = seg_map_640_.transpose(Image.FLIP_LEFT_RIGHT)
-  image_640_flip_left_right.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "00_" + file))
+  seg_map_640_left_right = seg_map_640_.transpose(Image.FLIP_LEFT_RIGHT)
+  seg_map_640_left_right.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "00_" + file))
   # Flip vertical
-  image_640_flip_top_bottom = seg_map_640_.transpose(Image.FLIP_TOP_BOTTOM)
-  image_640_flip_top_bottom.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "11_" + file))
+  seg_map_640_flip_top_bottom = seg_map_640_.transpose(Image.FLIP_TOP_BOTTOM)
+  seg_map_640_flip_top_bottom.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "11_" + file))
   
   # rotate 90 640 raw mask saving
   seg_map_rotate_640_90.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", "90_" + file))
@@ -175,7 +175,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   # rotate 270 640 raw mask saving
   seg_map_rotate_640_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", "270_" + file))
   
-  img_640_path = "./DRAC2022_dataset/Segmentation/Training/A/640/Original_images"
+  img_640_path = './DRAC2022_dataset/Segmentation/Training/A/640/Original_images'
   img_640_path_folder = os.path.exists(img_640_path)
   if not img_640_path_folder:
         os.makedirs(img_640_path)
