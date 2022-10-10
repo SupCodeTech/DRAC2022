@@ -57,8 +57,7 @@ bash python tools/model_converters/extract_backbone_weights.py \
 # Stage II: Semantic segmentation
 ## Semantic segmentation data preprocessing
 
-For Mask A and B, we provide the data preprocessing file `Mask_A_Data_preprocess.py` and `Mask_B_Data_preprocess.py` to preprocess the original data from [DRAC2022 Task 1](https://drive.google.com/file/d/1tCsqvsowjEsnyomcBTb600xLI26Y1Pxt/view?usp=sharing).
-Before you do that, you need to downlaod the Task 1 data. Then, unzip and put into the folloing directory:
+For Mask A and B, we provide the data preprocessing file `Mask_A_Data_preprocess.py` and `Mask_B_Data_preprocess.py` to preprocess the original data from DRAC2022 Task 1. Before you do that, you need to downlaod the [Task 1](https://drive.google.com/file/d/1tCsqvsowjEsnyomcBTb600xLI26Y1Pxt/view?usp=sharing) data. Then, unzip and put into the folloing directory:
 
 ```none
 ├── DRAC2022_dataset
