@@ -8,7 +8,8 @@ class DRACDataset_Mask_A(CustomDataset):
 
     CLASSES = ('Background', 'Intraretinal_microvascular_abnormals', 'Neovascularization','Intersection_of_Both' )
 
-    PALETTE = [[20, 20, 20], [30, 30, 30],[40, 40, 40],[45, 45, 45]]
+    PALETTE = [[125, 125, 125], [20, 10, 130], [140, 140, 40], [140, 40, 60]]
+
 
     def __init__(self, **kwargs):
         super(DRACDataset_Mask_A, self).__init__(
