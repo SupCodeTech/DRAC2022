@@ -75,8 +75,8 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
 
   seg_map_640 = Image.fromarray(seg_map_640).convert('P')
   seg_map_640_ = Image.fromarray(seg_map_640_).convert('P')
-  seg_map_640.resize((640, 640), Image.ANTIALIAS)
-  seg_map_640_.resize((640, 640), Image.ANTIALIAS)
+  seg_map_640 = seg_map_640.resize((640, 640), Image.ANTIALIAS)
+  seg_map_640_ = seg_map_640_.resize((640, 640), Image.ANTIALIAS)
   seg_map_640_.putpalette(np.array(palette, dtype=np.uint8))
 
   seg_map_rotate_640_90 = seg_map_640.rotate(90, expand=1)
@@ -148,7 +148,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
     os.makedirs(img_640_path)
   Original_image_640 = cv2.imread(img_dir + '/' + file, 1)
   Original_image_640 = Image.fromarray(Original_image_640).convert('RGB')
-  Original_image_640.resize((640, 640), Image.ANTIALIAS)
+  Original_image_640 = Original_image_640.resize((640, 640), Image.ANTIALIAS)
   # raw 640 image saving
   Original_image_640.save(osp.join("./DRAC2022_dataset/Segmentation/Training/B/640/Original_images", file.replace('.png','.jpg')))
 
