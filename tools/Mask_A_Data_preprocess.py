@@ -154,7 +154,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   # rotate 270 1024 raw image saving
   image_1024_270 = image_1024_.rotate(270, expand=1)
   image_1024_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images", "270_" +file.replace('.png','.jpg')))
-  seg_640_path = "./DRAC2022_dataset/Segmentation/Training/A/640/Original_images"
+  seg_640_path = "./DRAC2022_dataset/Segmentation/Training/A/640/Masks"
   seg_640_path_folder = os.path.exists(seg_640_path)
   if not seg_640_path_folder:
     os.makedirs(seg_640_path)
