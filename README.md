@@ -61,20 +61,20 @@ For Mask A and B, we provide the data preprocessing file `Mask_A_Data_preprocess
 
 ```none
 ├── DRAC2022_dataset
-│   ├── A. Segmentation
-│   │   ├── 1. Original Images
-│   │   │   ├── a. Training Set
+│   ├── A._Segmentation
+│   │   ├── 1._Original Images
+│   │   │   ├── a._Training Set
 │   │   │   │   ├── 065.png
 │   │   │   │   ├── ...
-│   │   ├── 2. Groundtruths
-│   │   │   ├── a. Training Set
-│   │   │   │   ├── 1. Intraretinal Microvascular Abnormalities
+│   │   ├── 2._Groundtruths
+│   │   │   ├── a._Training Set
+│   │   │   │   ├── 1._Intraretinal Microvascular Abnormalities
 │   │   │   │   │   ├── 082.png
 │   │   │   │   │   ├── ...
-│   │   │   │   ├── 2. Nonperfusion Areas
+│   │   │   │   ├── 2._Nonperfusion Areas
 │   │   │   │   │   ├── 065.png
 │   │   │   │   │   ├── ...
-│   │   │   │   ├── 3. Neovascularization
+│   │   │   │   ├── 3._Neovascularization
 │   │   │   │   │   ├── 082.png
 │   │   │   │   │   ├── ...
 ```
