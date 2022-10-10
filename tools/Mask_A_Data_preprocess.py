@@ -107,7 +107,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
 
   spilt = spilt + 1
 
-  # os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks")
+  os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks")
   seg_img_1024.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", file))
   # rotate 90 640 raw mask saving
   seg_map_rotate_1024_90.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", "90_" + file))
@@ -116,7 +116,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   # rotate 270 640 raw mask saving
   seg_map_rotate_1024_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", "270_" + file))
     
-  # os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images")
+  os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images")
   image_1024 = cv2.imread(img_dir + '/' + file, 1)
   image_1024_ = Image.fromarray(image_1024).convert('RGB')
   # raw 1024 image saving
@@ -131,7 +131,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   image_1024_270 = image_1024_.rotate(270, expand=1)
   image_1024_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images", "270_" +file.replace('.png','.jpg')))
 
-  # os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/640/Masks")
+  os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/640/Masks")
   # raw 640 mask saving
   seg_map_640_.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", file))
   # rotate 90 640 raw mask saving
@@ -144,7 +144,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   image_640 = cv2.imread(img_dir + '/' + file, 1)
   image_640 = img_resize(image_640)
   image_640 = Image.fromarray(image_640).convert('RGB')
-  # os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images")
+  os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images")
   # raw 640 image saving
   image_640.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", file.replace('.png','.jpg')))
   # rotate 90 640 raw image saving
