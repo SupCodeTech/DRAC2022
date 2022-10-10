@@ -11,7 +11,7 @@ class DRACDataset_Mask_B(CustomDataset):
     PALETTE = [[20, 20, 20], [50, 50, 50]]
 
     def __init__(self, **kwargs):
-        superDRACDataset_Mask_Bself).__init__(
+        super(DRACDataset_Mask_B, self).__init__(
             img_suffix='.jpg',
             seg_map_suffix='.png',
             reduce_zero_label=False,
