@@ -88,7 +88,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   seg_map_rotate_640_270 = seg_map_640.rotate(270, expand=1)
   seg_map_rotate_640_270.putpalette(np.array(palette, dtype=np.uint8))
 
-  seg_img_1024_path = "./DRAC2022_dataset/Segmentation/Training/B/1024/Masks"
+  seg_img_1024_path = './DRAC2022_dataset/Segmentation/Training/B/1024/Masks'
   seg_img_1024_path_folder = os.path.exists(seg_img_1024_path)
   if not seg_img_1024_path_folder:
     os.makedirs(seg_img_1024_path)
@@ -104,7 +104,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   # rotate 270 640 raw mask saving
   seg_map_rotate_1024_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/B/1024/Masks", "270_" + file))
 
-  img_1024_path = "./DRAC2022_dataset/Segmentation/Training/B/1024/Original_images"
+  img_1024_path = './DRAC2022_dataset/Segmentation/Training/B/1024/Original_images'
   img_1024_path_folder = os.path.exists(img_1024_path)
   if not img_1024_path_folder:
     os.makedirs(img_1024_path)
@@ -129,7 +129,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   image_1024_270 = image_1024_.rotate(270, expand=1)
   image_1024_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/B/1024/Original_images", "270_" +file.replace('.png','.jpg')))
 
-  seg_640_path = "./DRAC2022_dataset/Segmentation/Training/B/640/Masks"
+  seg_640_path = './DRAC2022_dataset/Segmentation/Training/B/640/Masks'
   seg_640_path_folder = os.path.exists(seg_640_path)
   if not seg_640_path_folder:
     os.makedirs(seg_640_path)
@@ -137,10 +137,10 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   seg_map_640_.save(osp.join("./DRAC2022_dataset/Segmentation/Training/B/640/Masks", file))
    # Flip horizontal
   image_640_flip_left_right = seg_map_640_.transpose(Image.FLIP_LEFT_RIGHT)
-  image_640_flip_left_right.save(osp.join("./DRAC2022_dataset/Segmentation/Training/B/640/Original_images", "00_" + file))
+  image_640_flip_left_right.save(osp.join("./DRAC2022_dataset/Segmentation/Training/B/640/Masks", "00_" + file))
   # Flip vertical
   image_640_flip_top_bottom = seg_map_640_.transpose(Image.FLIP_TOP_BOTTOM)
-  image_640_flip_top_bottom.save(osp.join("./DRAC2022_dataset/Segmentation/Training/B/640/Original_images", "11_" + file))
+  image_640_flip_top_bottom.save(osp.join("./DRAC2022_dataset/Segmentation/Training/B/640/Masks", "11_" + file))
   
   # rotate 90 640 raw mask saving
   seg_map_rotate_640_90.save(osp.join("./DRAC2022_dataset/Segmentation/Training/B/640/Masks", "90_" + file))
@@ -149,7 +149,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   # rotate 270 640 raw mask saving
   seg_map_rotate_640_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/B/640/Masks", "270_" + file))
   
-  img_640_path = "./DRAC2022_dataset/Segmentation/Training/B/640/Original_images"
+  img_640_path = './DRAC2022_dataset/Segmentation/Training/B/640/Original_images'
   img_640_path_folder = os.path.exists(img_640_path)
   if not img_640_path_folder:
     os.makedirs(img_640_path)
@@ -175,3 +175,4 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   # rotate 270 640 raw image saving
   image_640_270 = Original_image_640.rotate(270, expand=1)
   image_640_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/B/640/Original_images", "270_" +file.replace('.png','.jpg')))
+
