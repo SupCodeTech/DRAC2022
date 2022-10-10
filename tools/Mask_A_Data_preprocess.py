@@ -1,4 +1,3 @@
-%cd /content/DRAC2022
 import os.path as osp
 import numpy as np
 from PIL import Image
