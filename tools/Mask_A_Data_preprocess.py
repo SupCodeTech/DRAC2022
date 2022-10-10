@@ -115,8 +115,8 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
 
 
   seg_img_1024_path = './DRAC2022_dataset/Segmentation/Training/A/1024/Masks'
-  seg_img_1024_path = os.path.exists(seg_img_1024_path)
-  if not seg_img_1024_path:
+  seg_img_1024_path_folder = os.path.exists(seg_img_1024_path)
+  if not seg_img_1024_path_folder:
         os.makedirs(seg_img_1024_path)
   seg_img_1024.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", file))
   # Flip horizontal
@@ -131,8 +131,8 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   seg_map_rotate_1024_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", "270_" + file))
 
   img_1024_path = './DRAC2022_dataset/Segmentation/Training/A/1024/Original_images'
-  img_1024_path = os.path.exists(img_1024_path)
-  if not img_1024_path:
+  img_1024_path_folder = os.path.exists(img_1024_path)
+  if not img_1024_path_folder:
         os.makedirs(img_1024_path)
 
   image_1024 = cv2.imread(img_dir + '/' + file, 1)
@@ -156,8 +156,8 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   image_1024_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images", "270_" +file.replace('.png','.jpg')))
 
   seg_640_path = "./DRAC2022_dataset/Segmentation/Training/A/640/Masks"
-  seg_640_path = os.path.exists(seg_640_path)
-  if not seg_640_path:
+  seg_640_path_folder = os.path.exists(seg_640_path)
+  if not seg_640_path_folder:
         os.makedirs(seg_640_path)
   # raw 640 mask saving
   seg_map_640_.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", file))
@@ -169,8 +169,8 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   seg_map_rotate_640_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", "270_" + file))
   
   img_640_path = "./DRAC2022_dataset/Segmentation/Training/A/640/Original_images"
-  img_640_path = os.path.exists(img_640_path)
-  if not img_640_path:
+  img_640_path_folder = os.path.exists(img_640_path)
+  if not img_640_path_folder:
         os.makedirs(img_640_path)
   Original_image_640 = cv2.imread(img_dir + '/' + file, 1)
   Original_image_640 = Image.fromarray(Original_image_640).convert('RGB')
