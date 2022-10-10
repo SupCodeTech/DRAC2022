@@ -111,7 +111,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   seg_map_rotate_640_270.putpalette(np.array(palette, dtype=np.uint8))
 
 
-  # os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks")
+  os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks")
   seg_img_1024.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", file))
   # Flip horizontal
   seg_img_1024_flip_left_right.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", "00_" + file))
@@ -124,7 +124,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   # rotate 270 640 raw mask saving
   seg_map_rotate_1024_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", "270_" + file))
     
-  # os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images")
+  os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images")
   image_1024 = cv2.imread(img_dir + '/' + file, 1)
   image_1024_ = Image.fromarray(image_1024).convert('RGB')
   # raw 1024 image saving
@@ -145,7 +145,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   image_1024_270 = image_1024_.rotate(270, expand=1)
   image_1024_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Original_images", "270_" +file.replace('.png','.jpg')))
 
-  # os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/640/Masks")
+  os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/640/Masks")
   # raw 640 mask saving
   seg_map_640_.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", file))
   # rotate 90 640 raw mask saving
@@ -155,7 +155,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   # rotate 270 640 raw mask saving
   seg_map_rotate_640_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Masks", "270_" + file))
   
-  # os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images")
+  os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images")
   image_640 = cv2.imread(img_dir + '/' + file, 1)
   image_640 = img_resize(image_640)
   image_640 = Image.fromarray(image_640).convert('RGB')
