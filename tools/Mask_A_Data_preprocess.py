@@ -4,28 +4,34 @@ from PIL import Image
 from pandas import Series,DataFrame
 import sys
 import pickle
-from pandas import Series,DataFrame
 import pandas as pd
 import cv2
 import numpy as np
 import os
-from PIL import Image
 import tensorflow as tf
 import pandas as pd
 import shutil
+import mmcv
+import matplotlib.pyplot as plt
+import os.path as osp
+import numpy as np
+import sys
+import pickle
+import pandas as pd
+from mmseg.apis import inference_segmentor, init_segmentor, show_result_pyplot
+from mmseg.core.evaluation import get_palette
+# import tensorflow as tf
+import pandas as pd
 
 Resolution = 1024
 
-number_of_training = 80 # set the number of images for training, and the rest for testing.
-
-
-img_dir = 'DRAC2022_dataset/A. Segmentation/1. Original Images/a. Training Set'
-groundtruth = 'DRAC2022_dataset/A. Segmentation/2. Groundtruths/a. Training Set'
-img_dir_1 = '1. Intraretinal Microvascular Abnormalities'
-img_dir_3 = '3. Neovascularization'
+img_dir = 'DRAC2022_dataset/A._Segmentation/1._Original Images/a._Training Set'
+groundtruth = 'DRAC2022_dataset/A._Segmentation/2._Groundtruths/a._Training Set'
+img_dir_1 = '1._Intraretinal Microvascular Abnormalities'
+img_dir_3 = '3._Neovascularization'
 
 CLASSES = ('Background', 'Intraretinal_microvascular_abnormals', 'Neovascularization')
-PALETTE = [[20, 20, 20], [30, 30, 30], [40, 40, 40]]
+palette = [[20, 20, 20], [30, 30, 30], [40, 40, 40]]
 
 spilt = 0
 
@@ -71,19 +77,17 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   seg_map = seg_map_1 + seg_map_3
   
   # 1024
+  seg_img_1024_ = Image.fromarray(seg_map).convert('P')
   seg_img_1024 = Image.fromarray(seg_map).convert('P')
   seg_img_1024.putpalette(np.array(palette, dtype=np.uint8))
 
-  seg_map_rotate_1024_90 = seg_img_1024.rotate(90, expand=1)
-  seg_map_rotate_1024_90 = Image.fromarray(seg_map_rotate_1024_90).convert('P')
+  seg_map_rotate_1024_90 = seg_img_1024_.rotate(90, expand=1)
   seg_map_rotate_1024_90.putpalette(np.array(palette, dtype=np.uint8))
 
-  seg_map_rotate_1024_180 = seg_img_1024.rotate(180, expand=1)
-  seg_map_rotate_1024_180 = Image.fromarray(seg_map_rotate_1024_180).convert('P')
+  seg_map_rotate_1024_180 = seg_img_1024_.rotate(180, expand=1)
   seg_map_rotate_1024_180.putpalette(np.array(palette, dtype=np.uint8))
 
-  seg_map_rotate_1024_270 = seg_img_1024.rotate(270, expand=1)
-  seg_map_rotate_1024_270 = Image.fromarray(seg_map_rotate_1024_270).convert('P')
+  seg_map_rotate_1024_270 = seg_img_1024_.rotate(270, expand=1)
   seg_map_rotate_1024_270.putpalette(np.array(palette, dtype=np.uint8))
 
   # 640 
@@ -104,9 +108,6 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   seg_map_rotate_640_270.putpalette(np.array(palette, dtype=np.uint8))
 
   spilt = spilt + 1
-
-  number_of_training:
-
 
   os.makedirs("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks")
   seg_img_1024.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/1024/Masks", file))
