@@ -47,13 +47,13 @@ data = dict(
     val=dict(
         type=dataset_type,
         data_root=data_root,
-        img_dir = 'Val/A/640/Original_images',
-        ann_dir = 'Val/A/640/Masks',
+        img_dir = 'Training/A/640/Original_images',
+        ann_dir = 'Training/A/640/Masks',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
         data_root=data_root,
-        img_dir = 'Val/A/640/Original_images',
-        ann_dir = 'Val/A/640/Masks',
+        img_dir = 'Training/A/640/Original_images',
+        ann_dir = 'Training/A/640/Masks',
         pipeline=test_pipeline)
         )
