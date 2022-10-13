@@ -10,9 +10,6 @@ People with diabetes are more likely to develop retinal lesions than healthy peo
 ![Figure1](https://user-images.githubusercontent.com/111235455/194624992-cd09e471-d550-4e89-9e3f-3c152463fa0e.jpg)
 
 
-```shell
-git clone https://github.com/SupCodeTech/DRAC2022.git
-```
 
 # Stage I: Pre-task training
 
