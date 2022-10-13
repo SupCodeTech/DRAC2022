@@ -165,5 +165,7 @@ python tools/train.py configs/MCS_DRNet/C_Task_1_Mask_B_640x640.py
 ```
 
 
+## Acknowledgment
 
+Our implementation is mainly based on [mmsegmentaion](https://github.com/open-mmlab/mmsegmentation/tree/v0.24.1), [MAE](https://github.com/facebookresearch/mae),[Segformer](https://github.com/NVlabs/SegFormer) and [ConvNeXt](https://github.com/facebookresearch/ConvNeXt). Thanks for their authors.
 
