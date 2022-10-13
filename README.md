@@ -160,9 +160,14 @@ Usage:
 ```shell
 python tools/train.py configs/MCS_DRNet/C_Task_1_Mask_B_640x640.py
 ```
-
+## Contact
+If you have any question, please feel free to contact me via tan.joey@student.upm.edu.my
 
 ## Acknowledgment
 
 Our implementation is mainly based on [mmsegmentaion](https://github.com/open-mmlab/mmsegmentation/tree/v0.24.1), [MAE](https://github.com/facebookresearch/mae),      [Segformer](https://github.com/NVlabs/SegFormer) and [ConvNeXt](https://github.com/facebookresearch/ConvNeXt). Thanks for their authors.
+
+## LICENSE
+
+This repo is under the Apache-2.0 license. For commercial use, please contact the authors.
 
