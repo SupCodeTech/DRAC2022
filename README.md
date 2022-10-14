@@ -171,10 +171,10 @@ For mask B, usage:
 ```shell
 python tools/MCS_DRNet_Task_1_Mask_B_1536x1536.py --load-from-checkpoint-M ${file_dir} --load-from-checkpoint-C ${file_dir} --load-from-checkpoint-S ${file_dir} --data-dir ${file_dir} --output-data-dir ${file_dir} 
 ```
-`--load-from-checkpoint-M`: path to store checkpoints of the pretrained model MAE
-`--load-from-checkpoint-C`: path to store the checkpoints of the pretrained model ConvNeXt
-`--load-from-checkpoint-S`: path to store checkpoints of the pretrained model SegFormer
-`--data-dir`: path to test image
+`--load-from-checkpoint-M`: path to store checkpoints of the pretrained model MAE \
+`--load-from-checkpoint-C`: path to store the checkpoints of the pretrained model ConvNeXt \
+`--load-from-checkpoint-S`: path to store checkpoints of the pretrained model SegFormer \
+`--data-dir`: path to test image \
 `--output-data-dir`: output path of test results
 
 ## Contact
