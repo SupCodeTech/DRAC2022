@@ -4,24 +4,17 @@ from PIL import Image
 from pandas import Series,DataFrame
 import sys
 import pickle
-import pandas as pd
 import cv2
-import numpy as np
 import os
 import tensorflow as tf
 import pandas as pd
 import shutil
 import mmcv
 import matplotlib.pyplot as plt
-import os.path as osp
-import numpy as np
-import sys
-import pickle
-import pandas as pd
 from mmseg.apis import inference_segmentor, init_segmentor, show_result_pyplot
 from mmseg.core.evaluation import get_palette
 # import tensorflow as tf
-import pandas as pd
+
 
 Resolution = 1024
 
