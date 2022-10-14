@@ -165,11 +165,11 @@ For the tests of MaskA and B, we provide a test file `MCS_DRNet_Task_1_Mask_A_15
 
 For mask A, usage:
 ```shell
-python tools/MCS_DRNet_Task_1_Mask_A_1536x1536.py --load-from-checkpoint-M ${file_dir} --load-from-checkpoint-C ${file_dir} --load-from-checkpoint-S ${file_dir} --data-dir ${file_dir} 
+python tools/MCS_DRNet_Task_1_Mask_A_1536x1536.py --load-from-checkpoint-M ${file_dir} --load-from-checkpoint-C ${file_dir} --load-from-checkpoint-S ${file_dir} --data-dir ${file_dir} --output-data-dir ${file_dir} 
 ```
 For mask B, usage:
 ```shell
-python tools/MCS_DRNet_Task_1_Mask_B_1536x1536.py --load-from-checkpoint-M ${file_dir} --load-from-checkpoint-C ${file_dir} --load-from-checkpoint-S ${file_dir} --data-dir ${file_dir} 
+python tools/MCS_DRNet_Task_1_Mask_B_1536x1536.py --load-from-checkpoint-M ${file_dir} --load-from-checkpoint-C ${file_dir} --load-from-checkpoint-S ${file_dir} --data-dir ${file_dir} --output-data-dir ${file_dir} 
 ```
 
 ## Contact
