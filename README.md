@@ -175,7 +175,7 @@ python tools/MCS_DRNet_Task_1_Mask_B_1536x1536.py --load-from-checkpoint-M ${fil
 `--load-from-checkpoint-C`: path to store the checkpoints of the pretrained model ConvNeXt \
 `--load-from-checkpoint-S`: path to store checkpoints of the pretrained model SegFormer \
 `--data-dir`: path to test image \
-`--output-data-dir`: output path of test results
+`--output-data-dir`: output path of test segmentation results
 
 ## Contact
 If you have any question, please feel free to contact me via tan.joey@student.upm.edu.my
