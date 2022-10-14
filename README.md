@@ -1,5 +1,4 @@
 # DRAC2022 DR Segmentation
-`The project is still under construction`
 
 ## Abstract
 
@@ -160,6 +159,19 @@ Usage:
 ```shell
 python tools/train.py configs/MCS_DRNet/C_Task_1_Mask_B_640x640.py
 ```
+## Testing phase
+
+For the tests of MaskA and B, we provide a test file `MCS_DRNet_Task_1_Mask_A_1536x1536.py` and `MCS_DRNet_Task_1_Mask_B_1536x1536.py`(The document will soon be published)
+
+For mask A, usage:
+```shell
+python tools/MCS_DRNet_Task_1_Mask_A_1536x1536.py --load-from-checkpoint-M ${file_dir} --load-from-checkpoint-C ${file_dir} --load-from-checkpoint-S ${file_dir} --data-dir ${file_dir} 
+```
+For mask B, usage:
+```shell
+python tools/MCS_DRNet_Task_1_Mask_B_1536x1536.py --load-from-checkpoint-M ${file_dir} --load-from-checkpoint-C ${file_dir} --load-from-checkpoint-S ${file_dir} --data-dir ${file_dir} 
+```
+
 ## Contact
 If you have any question, please feel free to contact me via tan.joey@student.upm.edu.my
 
