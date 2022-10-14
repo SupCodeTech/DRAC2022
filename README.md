@@ -162,7 +162,7 @@ python tools/train.py configs/MCS_DRNet/C_Task_1_Mask_B_640x640.py
 ```
 ## Testing phase
 
-For the tests of MaskA and B, we provide the test file `MCS_DRNet_Task_1_Mask_A_1536x1536.py` and `MCS_DRNet_Task_1_Mask_B_1536x1536.py`(The document will soon be published).
+For the tests of Mask A and B, we provide the test file `MCS_DRNet_Task_1_Mask_A_1536x1536.py` and `MCS_DRNet_Task_1_Mask_B_1536x1536.py`(The document will soon be published).
 
 For mask A, usage:
 ```shell
