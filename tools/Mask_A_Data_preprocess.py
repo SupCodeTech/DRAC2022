@@ -38,18 +38,6 @@ import os.path
 import os
 import numpy as np
  
- 
-def img_resize(img):
-    height, width = img.shape[0], img.shape[1]
-    width_new = 640
-    height_new = 640
-    # Determine the ratio of length to width of the picture
-    if width / height >= width_new / height_new:
-        img_new = cv2.resize(img, (width_new, int(height * width_new / width)))
-    else:
-        img_new = cv2.resize(img, (int(width * height_new / height), height_new))
-    return img_new
- 
 for file in mmcv.scandir(img_dir, suffix='.png'):
 
   seg_map_1 = np.zeros(1048576).reshape((Resolution, Resolution))
