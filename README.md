@@ -25,7 +25,6 @@ Preparation of the dataset catalog
 
 ```shell
 nvcc -V
-# Check GCC version
 gcc --version
 pip install openmim
 mim install mmcv-full
@@ -125,13 +124,9 @@ Due to the limited data available for this contest, we did not set the validatio
 ## Semantic segmentation environment configuration
 
 ```shell
-# Check nvcc version
 nvcc -V
-# Check GCC version
 gcc --version
-# Install PyTorch
 pip install torch==1.12.0 torchvision --extra-index-url https://download.pytorch.org/whl/cu113
-# Install MMCV
 pip install openmim
 mim install mmcv-full==1.6.0
 cd ./DRAC2022
