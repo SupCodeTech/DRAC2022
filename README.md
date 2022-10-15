@@ -6,9 +6,6 @@ People with diabetes are more likely to develop retinal lesions than healthy peo
 
 <!-- [ABSTRACT] -->
 
-![Figure1](https://user-images.githubusercontent.com/111235455/194624992-cd09e471-d550-4e89-9e3f-3c152463fa0e.jpg)
-
-
 The code is based on [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmsegmentation/tree/v0.24.1).
 
 # Stage I: Pre-task training
