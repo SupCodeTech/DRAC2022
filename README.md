@@ -46,6 +46,7 @@ bash python tools/model_converters/extract_backbone_weights.py \
   Pre_training_output_dirs/epoch_1600.pth \
   Pre_training_output_dirs/Pre_training_weight_backbone.pth
 ```
+Get the pre-trained MAE-ViT, which you can also implement [this way](https://github.com/facebookresearch/mae/blob/main/FINETUNE.md).
 
 # Stage II: Semantic segmentation
 ## Semantic segmentation data preprocessing
