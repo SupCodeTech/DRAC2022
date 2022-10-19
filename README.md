@@ -10,6 +10,8 @@ The code is based on [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmseg
 
 # Stage I: Pre-task training
 
+## The first method to get the pre-trained MAE-ViT.
+
 Preparation of the dataset catalog
 
 ```none
@@ -21,7 +23,7 @@ Preparation of the dataset catalog
 │   │   ├── pre_train.txt
 ```
 
-## Configure the semi-supervised learning environment
+### Configure the pre-task learning environment
 
 ```shell
 nvcc -V
@@ -33,19 +35,39 @@ cd DRAC2022/Se_sup/
 # Install MMSelfSup from source
 pip install -e .
 ```
-## Running the example script of different MAE algorithm for pre-training task
+### Running the example script of different MAE algorithm for pre-training task
 Usage: 
 ```shell
 bash python tools/train.py configs/selfsup/mae/mae_vit-base-p16_8xb512-coslr-400e_drac2022.py 
 ```
 
-## Extract the weight of pre-training MAE
+### Extract the weight of pre-training MAE
 Usage: 
 ```shell
 bash python tools/model_converters/extract_backbone_weights.py \
   Pre_training_output_dirs/epoch_1600.pth \
   Pre_training_output_dirs/Pre_training_weight_backbone.pth
 ```
+## The second method to get the pre-trained MAE-ViT.
+
+To fine-tune with **multi-node distributed training**, run the following on 2 nodes with 1 GPUs each:
+```
+python submitit_finetune.py \
+    --job_dir ${JOB_DIR} \
+    --nodes 2 \
+    --batch_size 32 \
+    --model vit_base_patch16 \
+    --finetune ${PRETRAIN_CHKPT} \
+    --epochs 1600 \
+    --blr 5e-4 --layer_decay 0.65 \
+    --weight_decay 0.05 --drop_path 0.1 --reprob 0.25 --mixup 0.8 --cutmix 1.0 \
+    --dist_eval --data_path ${IMAGENET_DIR}
+```
+- Install submitit (`pip install submitit`) first.
+- Here the effective batch size is 96 (`batch_size` per gpu) * 2 (`nodes`) * 1 (gpus per node) = 192.
+- `blr` is the base learning rate. The actual `lr` is computed by the [linear scaling rule](https://arxiv.org/abs/1706.02677): `lr` = `blr` * effective batch size / 256.
+
+
 
 # Stage II: Semantic segmentation
 ## Semantic segmentation data preprocessing
