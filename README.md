@@ -68,7 +68,7 @@ python submitit_finetune.py \
 - `blr` is the base learning rate. The actual `lr` is computed by the [linear scaling rule](https://arxiv.org/abs/1706.02677): `lr` = `blr` * effective batch size / 256.
 
 The second method can obtain the weight of MAE-ViT pre-training more directly.
-
+The detailed implementation process can refer to [this document](https://github.com/facebookresearch/mae).
 
 # Stage II: Semantic segmentation
 ## Semantic segmentation data preprocessing
