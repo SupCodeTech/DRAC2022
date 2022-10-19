@@ -50,12 +50,12 @@ bash python tools/model_converters/extract_backbone_weights.py \
 ```
 ## The second method to get the pre-trained MAE-ViT.
 
-To fine-tune with **multi-node distributed training**, run the following on 2 nodes with 1 GPUs each:
+To fine-tune with **multi-node distributed training**, run the following on 2 nodes with 2 GPUs each:
 ```
 python submitit_finetune.py \
     --job_dir ${JOB_DIR} \
     --nodes 2 \
-    --batch_size 32 \
+    --batch_size 96 \
     --model vit_base_patch16 \
     --finetune ${PRETRAIN_CHKPT} \
     --epochs 1600 \
@@ -64,7 +64,7 @@ python submitit_finetune.py \
     --dist_eval --data_path ${IMAGENET_DIR}
 ```
 - Install submitit (`pip install submitit`) first.
-- Here the effective batch size is 96 (`batch_size` per gpu) * 2 (`nodes`) * 1 (gpus per node) = 192.
+- Here the effective batch size is 96 (`batch_size` per gpu) * 2 (`nodes`) * 2 (gpus per node) = 384.
 - `blr` is the base learning rate. The actual `lr` is computed by the [linear scaling rule](https://arxiv.org/abs/1706.02677): `lr` = `blr` * effective batch size / 256.
 
 The second method can obtain the weight of MAE-ViT pre-training more directly.
