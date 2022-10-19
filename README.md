@@ -67,6 +67,7 @@ python submitit_finetune.py \
 - Here the effective batch size is 96 (`batch_size` per gpu) * 2 (`nodes`) * 1 (gpus per node) = 192.
 - `blr` is the base learning rate. The actual `lr` is computed by the [linear scaling rule](https://arxiv.org/abs/1706.02677): `lr` = `blr` * effective batch size / 256.
 
+The second method can obtain the weight of MAE-ViT pre-training more directly.
 
 
 # Stage II: Semantic segmentation
