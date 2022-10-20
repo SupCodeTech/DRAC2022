@@ -56,7 +56,7 @@ For Mask A and B, we provide the data preprocessing file `Mask_A_Data_preprocess
 For example, for Mask A usage:
 
 ```shell
-bash python tools/Mask_A_Data_preprocess.py
+python tools/Mask_A_Data_preprocess.py
 ```
 
 ## The data directory for the semantic segmentation task
@@ -117,7 +117,7 @@ pip install -e .
 ## Running the example script of different sub-algorithm in training Mask A:
 Usage:
 ```shell
-bash python tools/train.py configs/MCS_DRNet/(sub-algorithm)_Task_1_Mask_A_(640x640/1024x1024).py
+python tools/train.py configs/MCS_DRNet/(sub-algorithm)_Task_1_Mask_A_(640x640/1024x1024).py
 ```
 
 The sub-algorithm contains three values: `M`, `C`, and `S`. The resolution `1024x1024` is unique to the `S` algorithm.
@@ -125,13 +125,13 @@ For example, we want to run the subalgorithm `M`.
 
 Usage:
 ```shell
-bash python tools/train.py configs/MCS_DRNet/M_Task_1_Mask_A_640x640.py
+python tools/train.py configs/MCS_DRNet/M_Task_1_Mask_A_640x640.py
 ```
 ## Running the example script of sub-algorithm C in training Mask B:
 
 Usage:
 ```shell
-bash python tools/train.py configs/MCS_DRNet/C_Task_1_Mask_B_640x640.py
+python tools/train.py configs/MCS_DRNet/C_Task_1_Mask_B_640x640.py
 ```
 ## Testing phase
 
@@ -139,11 +139,11 @@ For the tests of Mask A and B, we provide the test file `MCS_DRNet_Task_1_Mask_A
 
 For mask A, usage:
 ```shell
-bash python tools/MCS_DRNet_Task_1_Mask_A_1536x1536.py --load-from-checkpoint-M ${file_dir} --load-from-checkpoint-C ${file_dir} --load-from-checkpoint-S ${file_dir} --data-dir ${file_dir} --output-data-dir ${file_dir} 
+python tools/MCS_DRNet_Task_1_Mask_A_1536x1536.py --load-from-checkpoint-M ${file_dir} --load-from-checkpoint-C ${file_dir} --load-from-checkpoint-S ${file_dir} --data-dir ${file_dir} --output-data-dir ${file_dir} 
 ```
 For mask B, usage:
 ```shell
-bash python tools/MCS_DRNet_Task_1_Mask_B_1536x1536.py --load-from-checkpoint-M ${file_dir} --load-from-checkpoint-C ${file_dir} --load-from-checkpoint-S ${file_dir} --data-dir ${file_dir} --output-data-dir ${file_dir} 
+python tools/MCS_DRNet_Task_1_Mask_B_1536x1536.py --load-from-checkpoint-M ${file_dir} --load-from-checkpoint-C ${file_dir} --load-from-checkpoint-S ${file_dir} --data-dir ${file_dir} --output-data-dir ${file_dir} 
 ```
 `--load-from-checkpoint-M`: path to store checkpoints of the pretrained model MAE \
 `--load-from-checkpoint-C`: path to store the checkpoints of the pretrained model ConvNeXt \
