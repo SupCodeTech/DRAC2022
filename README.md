@@ -41,7 +41,7 @@ The pre-training environment is configured as follows:
 pip install openmim
 mim install mmcv-full
 pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.10/index.html
-cd .DRAC2022/Se_sup/
+cd ./DRAC2022/Se_sup/
 pip install -e .
 ```
 Next, we run the following statement to begin our pre-training：
