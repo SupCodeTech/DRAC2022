@@ -73,24 +73,6 @@ After running, the model is saved in the following directory：
 │   │   ├── mae
 │   │   │   ├── pretrain_backbone_16k.pth
 ```
-## Another way to get the pretrained mae-vit backbone.
-To fine-tune with **multi-node distributed training**, run the following on 2 nodes with 2 GPUs each:
-```
-python submitit_finetune.py \
-    --job_dir ${JOB_DIR} \
-    --nodes 2 \
-    --batch_size 96 \
-    --model vit_base_patch16 \
-    --finetune ${PRETRAIN_CHKPT} \
-    --epochs 1600 \
-    --blr 5e-4 --layer_decay 0.65 \
-    --weight_decay 0.05 --drop_path 0.1 --reprob 0.25 --mixup 0.8 --cutmix 1.0 \
-    --dist_eval --data_path ${IMAGENET_DIR}
-```
-- Install submitit (`pip install submitit`) first.
-- Here the effective batch size is 96 (`batch_size` per gpu) * 2 (`nodes`) * 2 (gpus per node) = 384.
-- `blr` is the base learning rate. The actual `lr` is computed by the [linear scaling rule](https://arxiv.org/abs/1706.02677): `lr` = `blr` * effective batch size / 256.
-The detailed implementation process can refer to [this document](https://github.com/facebookresearch/mae).
 
 # Stage II: Semantic segmentation
 ## Semantic segmentation data preprocessing
