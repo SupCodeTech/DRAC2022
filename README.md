@@ -12,37 +12,60 @@ The code is based on [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmseg
 
 # Stage I: Pre-task training
 
+Download the DRAC Task 3 dataset and unzip it. Save the data in the following directory:
+
 ```none
 ├── Se_sup
-│   ├── Pretrain_dataset
-│   │   ├── 1._Original Images
-│   │   │   ├── a._Training Set
-│   │   │   │   ├── 065.png
+│   ├── C._Diabetic_Retinopathy_Grading
+│   │   ├── 1._Original_Images
+│   │   │   ├── a._Training_Set
+│   │   │   │   ├── 001.png
 │   │   │   │   ├── ...
 │   │   ├── 2._Groundtruths
-│   │   │   ├── a._Training Set
-│   │   │   │   ├── 1._Intraretinal Microvascular Abnormalities
-│   │   │   │   │   ├── 082.png
-│   │   │   │   │   ├── ...
-│   │   │   │   ├── 2._Nonperfusion Areas
-│   │   │   │   │   ├── 065.png
-│   │   │   │   │   ├── ...
-│   │   │   │   ├── 3._Neovascularization
-│   │   │   │   │   ├── 082.png
-│   │   │   │   │   ├── ...
+│   │   │   ├── a._DRAC2022_Diabetic_Retinopathy_Grading_Training_Labels.csv
 ```
+
+After preprocessing the data, the data will be saved in the following directory. (This data preprocessing file will be published soon)
+
+```none
+├── Se_sup
+│   ├── Data
+│   │   ├── Original_Images
+│   │   │   ├── Training_Set
+│   │   │   │   ├── 001.png
+│   │   │   │   ├── ...
+│   │   ├── Pretrained_files.txt
+```
+The pre-training environment is configured as follows:
+```shell
+pip install openmim
+mim install mmcv-full
+pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.10/index.html
+cd ./Se_sup/
+pip install -e .
+```
+Next, we run the following statement to begin our pre-training：
 
 ```shell
 python ./configs/selfsup/mae/mae.py
 ```
 
-## Please run the following shell statement in the `Se_sup` directory to obtain the Backbone of pre-trained MAE-ViT.
+After the above statement runs, the pre-trained MAE model will be saved in the following directory:
+
+```none
+├── Se_sup
+│   ├── work_dirs
+│   │   ├── mae
+│   │   │   ├── epoch_16000.pth
+```
+
+Then, please run the following shell statement in the `Se_sup` directory to obtain the backbone of pre-trained MAE-ViT.
 
 ```shell
 python tools/model_converters/extract_backbone_weights_mae_vit.py
 ```
 
-## After running, the model is saved in the following directory：
+After running, the model is saved in the following directory：
 
 ```none
 ├── Se_sup
