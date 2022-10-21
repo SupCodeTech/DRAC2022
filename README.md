@@ -62,7 +62,7 @@ After the above statement runs, the pre-trained MAE model will be saved in the f
 Then, please run the following shell statement in the `Se_sup` directory to obtain the backbone of pre-trained MAE-ViT.
 
 ```shell
-python tools/model_converters/extract_backbone_weights.py
+python tools/model_converters/extract_backbone_weights.py work_dirs/mae/epoch_16000.pth work_dirs/mae/pretrain_backbone_16k.pth
 ```
 
 After running, the model is saved in the following directory：
