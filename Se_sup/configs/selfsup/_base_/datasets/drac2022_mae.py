@@ -36,8 +36,8 @@ data = dict(
         type=dataset_type,
         data_source=dict(
             type=data_source,
-            data_prefix='./Data/pre_training_data',
-            ann_file='./Data/pre_train.txt',
+            data_prefix='./Data/Original_Images/Training_Set',
+            ann_file='./Data/Pretrained_files.txt',
         ),
         pipeline=train_pipeline,
         prefetch=prefetch))
