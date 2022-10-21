@@ -4,7 +4,7 @@ _base_ = [
 ]
 
 model = dict(
-    pretrained='Se_sup/Pre_training_output_dirs/Pre_training_weight_backbone.pth',
+    pretrained='./Se_sup/work_dirs/mae/pretrain_backbone_16k.pth',
     backbone=dict(
         type='MAE',
         img_size=(640, 640),
