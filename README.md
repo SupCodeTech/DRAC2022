@@ -12,6 +12,45 @@ The code is based on [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmseg
 
 # Stage I: Pre-task training
 
+```none
+├── Se_sup
+│   ├── Pretrain_dataset
+│   │   ├── 1._Original Images
+│   │   │   ├── a._Training Set
+│   │   │   │   ├── 065.png
+│   │   │   │   ├── ...
+│   │   ├── 2._Groundtruths
+│   │   │   ├── a._Training Set
+│   │   │   │   ├── 1._Intraretinal Microvascular Abnormalities
+│   │   │   │   │   ├── 082.png
+│   │   │   │   │   ├── ...
+│   │   │   │   ├── 2._Nonperfusion Areas
+│   │   │   │   │   ├── 065.png
+│   │   │   │   │   ├── ...
+│   │   │   │   ├── 3._Neovascularization
+│   │   │   │   │   ├── 082.png
+│   │   │   │   │   ├── ...
+```
+
+```shell
+python ./configs/selfsup/mae/mae.py
+```
+
+## Please run the following shell statement in the `Se_sup` directory to obtain the Backbone of pre-trained MAE-ViT.
+
+```shell
+python tools/model_converters/extract_backbone_weights_mae_vit.py
+```
+
+## After running, the model is saved in the following directory：
+
+```none
+├── Se_sup
+│   ├── work_dirs
+│   │   ├── mae
+│   │   │   ├── pretrain_backbone_16k.pth
+```
+## Another way to get the pretrained mae-vit backbone.
 To fine-tune with **multi-node distributed training**, run the following on 2 nodes with 2 GPUs each:
 ```
 python submitit_finetune.py \
