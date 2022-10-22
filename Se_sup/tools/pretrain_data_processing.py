@@ -24,7 +24,7 @@ for i in range(611):
   for j in range(6):
     output_list_.append(DR_grade[i])
 
-file = open('./data.txt','w',encoding='utf-8')
+file = open('./Data/Pretrained_files.txt','w',encoding='utf-8')
 for i in range(len(output_list)):
   file.write(str(output_list[i]) + ' ' + str(output_list_[i])  +'\n')
 file.close()
@@ -35,7 +35,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   Original_image_224 = Image.fromarray(Original_image_224).convert('RGB')
   Original_image_224 = Original_image_224.resize((224, 224), Image.ANTIALIAS)
   # raw 224 image saving
-  Original_image_224.save(osp.join("/content/data", file.replace('.png','.jpg')))
+  Original_image_224.save(osp.join("./Data/", file.replace('.png','.jpg')))
   # Flip horizontal
   image_224_flip_left_right = Original_image_224.transpose(Image.FLIP_LEFT_RIGHT)
   image_224_flip_left_right.save(osp.join("/content/data", "00_" + file.replace('.png','.jpg')))
