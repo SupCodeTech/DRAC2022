@@ -12,7 +12,16 @@ The code is based on [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmseg
 
 # Stage I: Pre-task training
 
-Download the DRAC Task 3 dataset and unzip it. Save the data in the following directory:
+The pre-training environment is configured as follows:
+```shell
+pip install openmim
+mim install mmcv-full
+pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.10/index.html
+cd ./DRAC2022/Se_sup/
+pip install -e .
+```
+
+Then, download the DRAC Task 3 dataset and unzip it. Save the data in the following directory:
 
 ```none
 ├── Se_sup
@@ -25,7 +34,7 @@ Download the DRAC Task 3 dataset and unzip it. Save the data in the following di
 │   │   │   ├── a._DRAC2022_Diabetic_Retinopathy_Grading_Training_Labels.csv
 ```
 
-After preprocessing the data, the data will be saved in the following directory. (This data preprocessing file will be published soon)
+By using the `pretrain_data_processing.py`, the processing data will be saved in the following directory
 
 ```none
 ├── Se_sup
@@ -36,14 +45,7 @@ After preprocessing the data, the data will be saved in the following directory.
 │   │   │   │   ├── ...
 │   │   ├── Pretrained_files.txt
 ```
-The pre-training environment is configured as follows:
-```shell
-pip install openmim
-mim install mmcv-full
-pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.10/index.html
-cd ./DRAC2022/Se_sup/
-pip install -e .
-```
+
 Next, we run the following statement to begin our pre-training：
 
 ```shell
