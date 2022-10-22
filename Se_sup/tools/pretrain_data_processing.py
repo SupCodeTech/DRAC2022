@@ -7,14 +7,15 @@ import mmcv
 from PIL import Image
 import os.path as osp
 
-
-
-data_pd = pd.read_csv('./C._Diabetic_Retinopathy_Grading/2._Groundtruths/a._DRAC2022_ Diabetic_Retinopathy_Grading_Training_Labels.csv')
-image_name = list(data_pd['image name'])
-DR_grade = list(data_pd['DR grade'])
-
-output_list = []
-output_list_ = []
+# From the following directories
+# ├── Se_sup
+# │   ├── C._Diabetic_Retinopathy_Grading
+# │   │   ├── 1._Original_Images
+# │   │   │   ├── a._Training_Set
+# │   │   │   │   ├── 001.png
+# │   │   │   │   ├── ...
+# │   │   ├── 2._Groundtruths
+# │   │   │   ├── a._DRAC2022_Diabetic_Retinopathy_Grading_Training_Labels.csv
 
 # To generate the following directories
 # ├── Se_sup
@@ -25,6 +26,13 @@ output_list_ = []
 # │   │   │   │   ├── ...
 # │   │   ├── Pretrained_files.txt
 
+data_pd = pd.read_csv('./C._Diabetic_Retinopathy_Grading/2._Groundtruths/a._DRAC2022_Diabetic_Retinopathy_Grading_Training_Labels.csv')
+image_name = list(data_pd['image name'])
+DR_grade = list(data_pd['DR grade'])
+
+output_list = []
+output_list_ = []
+
 for i in range(611):
   output_list.append(image_name[i][:-4] + ".jpg")
   output_list.append("00_" + image_name[i][:-4] + ".jpg")
@@ -34,17 +42,26 @@ for i in range(611):
   output_list.append("270_" + image_name[i][:-4] + ".jpg")
   for j in range(6):
     output_list_.append(DR_grade[i])
+    
+Data_path = './Data'
+Data_path_folder = os.path.exists(Data_path)
+if not Data_path_folder:
+  os.makedirs(Data_path)
 
 file = open('./Data/Pretrained_files.txt','w',encoding='utf-8')
 for i in range(len(output_list)):
   file.write(str(output_list[i]) + ' ' + str(output_list_[i])  +'\n')
 file.close()
+img_dir = './C._Diabetic_Retinopathy_Grading/1._Original_Images/a._Training_Set'
 
-img_dir = '/.C._Diabetic_Retinopathy_Grading/1._Original_Images/a._Training_Set'
 for file in mmcv.scandir(img_dir, suffix='.png'):
   Original_image_224 = cv2.imread(img_dir + '/' + file, 1)
   Original_image_224 = Image.fromarray(Original_image_224).convert('RGB')
   Original_image_224 = Original_image_224.resize((224, 224), Image.ANTIALIAS)
+  Data_path_ = './Data/Original_Images/Training_Set'
+  Data_path_folder = os.path.exists(Data_path_)
+  if not Data_path_folder:
+    os.makedirs(Data_path_)
   # raw 224 image saving
   Original_image_224.save(osp.join("./Data/Original_Images/Training_Set", file.replace('.png','.jpg')))
   # Flip horizontal
