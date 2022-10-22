@@ -34,7 +34,7 @@ Then, download the DRAC Task 3 dataset and unzip it. Save the data in the follow
 │   │   │   ├── a._DRAC2022_Diabetic_Retinopathy_Grading_Training_Labels.csv
 ```
 
-By using the `pretrain_data_processing.py`, the processing data will be saved in the following directory
+By using the `DRAC2022/Se_sup/tools/pretrain_data_processing.py`, the processing data will be saved in the following directory
 
 ```none
 ├── Se_sup
