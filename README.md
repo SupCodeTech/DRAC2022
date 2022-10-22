@@ -54,7 +54,7 @@ the processing data will be saved in the following directory:
 Next, we run the following statement to begin our pre-training：
 
 ```shell
-python ./configs/selfsup/mae/mae.py
+python tools/train.py configs/selfsup/mae/mae.py
 ```
 
 After the above statement runs, the pre-trained MAE model will be saved in the following directory:
