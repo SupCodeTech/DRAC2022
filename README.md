@@ -45,7 +45,7 @@ the processing data will be saved in the following directory:
 │   ├── Data
 │   │   ├── Original_Images
 │   │   │   ├── Training_Set
-│   │   │   │   ├── 001.png
+│   │   │   │   ├── 001.jpg
 │   │   │   │   ├── ...
 │   │   ├── Pretrained_files.txt
 ```
