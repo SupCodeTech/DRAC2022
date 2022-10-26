@@ -1,14 +1,17 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
 import torch.nn as nn
-from mmcv.runner import BaseModule
+from mmengine.model import BaseModule
 
 
 class Sobel(BaseModule):
-    """Sobel layer."""
+    """Sobel layer.
 
-    def __init__(self):
-        super(Sobel, self).__init__()
+    The layer reduces channels from 3 to 2.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
         grayscale = nn.Conv2d(3, 1, kernel_size=1, stride=1, padding=0)
         grayscale.weight.data.fill_(1.0 / 3.0)
         grayscale.bias.data.zero_()
@@ -22,5 +25,6 @@ class Sobel(BaseModule):
         for p in self.sobel.parameters():
             p.requires_grad = False
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Run sobel layer."""
         return self.sobel(x)

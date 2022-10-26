@@ -1,35 +1,40 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
-from mmcv.runner import BaseModule
-from torch.nn import functional as F
+from mmengine.model import BaseModule
 
-from ..builder import HEADS
+from mmselfsup.registry import MODELS
 
 
-@HEADS.register_module()
+@MODELS.register_module()
 class SimMIMHead(BaseModule):
     """Pretrain Head for SimMIM.
 
     Args:
         patch_size (int): Patch size of each token.
-        encoder_in_channels (int): Number of input channels for encoder.
+        loss (dict): The config for loss.
     """
 
-    def __init__(self, patch_size: int, encoder_in_channels: int) -> None:
-        super(SimMIMHead, self).__init__()
+    def __init__(self, patch_size: int, loss: dict) -> None:
+        super().__init__()
         self.patch_size = patch_size
-        self.encoder_in_channels = encoder_in_channels
+        self.loss = MODELS.build(loss)
 
-    def forward(self, x: torch.Tensor, x_rec: torch.Tensor,
-                mask: torch.Tensor) -> dict:
-        losses = dict()
+    def forward(self, pred: torch.Tensor, target: torch.Tensor,
+                mask: torch.Tensor) -> torch.Tensor:
+        """Forward function of MAE Loss.
 
+        This method will expand mask to the size of the original image.
+
+        Args:
+            pred (torch.Tensor): The reconstructed image.
+            target (torch.Tensor): The target image.
+            mask (torch.Tensor): The mask of the target image.
+
+        Returns:
+            torch.Tensor: The reconstruction loss.
+        """
         mask = mask.repeat_interleave(self.patch_size, 1).repeat_interleave(
             self.patch_size, 2).unsqueeze(1).contiguous()
-        loss_rec = F.l1_loss(x, x_rec, reduction='none')
-        loss = (loss_rec * mask).sum() / (mask.sum() +
-                                          1e-5) / self.encoder_in_channels
+        loss = self.loss(pred, target, mask)
 
-        losses['loss'] = loss
-
-        return losses
+        return loss

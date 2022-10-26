@@ -1,19 +1,22 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import Tuple
+
 import torch
-import torch.distributed as dist
 import torch.nn as nn
-from mmcv.runner import BaseModule, get_dist_info
+from mmengine.dist import all_gather, get_dist_info
+from mmengine.model import BaseModule
 
+from mmselfsup.registry import MODELS
 from mmselfsup.utils import AliasMethod
-from ..builder import MEMORIES
 
 
-@MEMORIES.register_module()
+@MODELS.register_module()
 class SimpleMemory(BaseModule):
-    """Simple memory bank (e.g., for NPID).
+    """Simple feature memory bank.
 
     This module includes the memory bank that stores running average
-    features of all samples in the dataset.
+    features of all samples in the dataset. It is used in algorithms
+    like NPID.
 
     Args:
         length (int): Number of features stored in the memory bank.
@@ -21,49 +24,45 @@ class SimpleMemory(BaseModule):
         momentum (float): Momentum coefficient for updating features.
     """
 
-    def __init__(self, length, feat_dim, momentum, **kwargs):
-        super(SimpleMemory, self).__init__()
+    def __init__(self, length: int, feat_dim: int, momentum: float,
+                 **kwargs) -> None:
+        super().__init__()
         self.rank, self.num_replicas = get_dist_info()
-        self.feature_bank = torch.randn(length, feat_dim).cuda()
-        self.feature_bank = nn.functional.normalize(self.feature_bank).cuda()
+        self.register_buffer('feature_bank', torch.randn(length, feat_dim))
+        self.feature_bank = nn.functional.normalize(self.feature_bank)
         self.momentum = momentum
         self.multinomial = AliasMethod(torch.ones(length))
-        self.multinomial.cuda()
 
-    def update(self, ind, feature):
-        """Update features in memory bank.
+    def update(self, idx: torch.Tensor, feature: torch.Tensor) -> None:
+        """Update features in the memory bank.
 
         Args:
-            ind (Tensor): Indices for the batch of features.
-            feature (Tensor): Batch of features.
+            idx (torch.Tensor): Indices for the batch of features.
+            feature (torch.Tensor): Batch of features.
         """
         feature_norm = nn.functional.normalize(feature)
-        ind, feature_norm = self._gather(ind, feature_norm)
-        feature_old = self.feature_bank[ind, ...]
+        idx, feature_norm = self._gather(idx, feature_norm)
+        feature_old = self.feature_bank[idx, ...]
         feature_new = (1 - self.momentum) * feature_old + \
             self.momentum * feature_norm
         feature_new_norm = nn.functional.normalize(feature_new)
-        self.feature_bank[ind, ...] = feature_new_norm
+        self.feature_bank[idx, ...] = feature_new_norm
 
-    def _gather(self, ind, feature):
+    def _gather(self, idx: torch.Tensor,
+                feature: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """Gather indices and features.
 
         Args:
-            ind (Tensor): Indices for the batch of features.
-            feature (Tensor): Batch of features.
+            idx (torch.Tensor): Indices for the batch of features.
+            feature (torch.Tensor): Batch of features.
 
         Returns:
-            Tensor: Gathered indices.
-            Tensor: Gathered features.
+            Tuple[torch.Tensor, torch.Tensor]: Gathered information.
+                - idx_gathered: Gathered indices.
+                - feature_gathered: Gathered features.
         """
-        ind_gathered = [
-            torch.ones_like(ind).cuda() for _ in range(self.num_replicas)
-        ]
-        feature_gathered = [
-            torch.ones_like(feature).cuda() for _ in range(self.num_replicas)
-        ]
-        dist.all_gather(ind_gathered, ind)
-        dist.all_gather(feature_gathered, feature)
-        ind_gathered = torch.cat(ind_gathered, dim=0)
+        idx_gathered = all_gather(idx)
+        feature_gathered = all_gather(feature)
+        idx_gathered = torch.cat(idx_gathered, dim=0)
         feature_gathered = torch.cat(feature_gathered, dim=0)
-        return ind_gathered, feature_gathered
+        return idx_gathered, feature_gathered

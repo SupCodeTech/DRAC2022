@@ -31,7 +31,7 @@ python tools/train.py ${CONFIG_FILE}
 ### 使用 单张/多张 显卡训练
 
 ```shell
-bash tools/dist_train.sh ${CONFIG_FILE} ${GPUS} --work-dir ${YOUR_WORK_DIR} [optional arguments]
+sh tools/dist_train.sh ${CONFIG_FILE} ${GPUS} --work-dir ${YOUR_WORK_DIR} [optional arguments]
 ```
 
 可选参数:
@@ -43,7 +43,7 @@ bash tools/dist_train.sh ${CONFIG_FILE} ${GPUS} --work-dir ${YOUR_WORK_DIR} [opt
 
 ```shell
 # checkpoints and logs saved in WORK_DIR=work_dirs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k/
-bash tools/dist_train.sh configs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k.py 8 --work_dir work_dirs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k/
+sh tools/dist_train.sh configs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k.py 8 --work_dir work_dirs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k/
 ```
 
 **注意**: 在训练过程中, checkpoints 和 logs 被保存在同一目录层级下.
@@ -51,13 +51,13 @@ bash tools/dist_train.sh configs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k
 此外, 如果您在一个被 [slurm](https://slurm.schedmd.com/) 管理的集群中训练， 您可以使用以下的脚本开展训练:
 
 ```shell
-GPUS_PER_NODE=${GPUS_PER_NODE} GPUS=${GPUS} SRUN_ARGS=${SRUN_ARGS} bash tools/slurm_train.sh ${PARTITION} ${JOB_NAME} ${CONFIG_FILE} ${YOUR_WORK_DIR} [optional arguments]
+GPUS_PER_NODE=${GPUS_PER_NODE} GPUS=${GPUS} SRUN_ARGS=${SRUN_ARGS} sh tools/slurm_train.sh ${PARTITION} ${JOB_NAME} ${CONFIG_FILE} ${YOUR_WORK_DIR} [optional arguments]
 ```
 
 例如:
 
 ```shell
-GPUS_PER_NODE=8 GPUS=8 bash tools/slurm_train.sh Dummy Test_job configs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k.py work_dirs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k/
+GPUS_PER_NODE=8 GPUS=8 sh tools/slurm_train.sh Dummy Test_job configs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k.py work_dirs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k/
 ```
 
 ### 使用多台机器训练
@@ -67,13 +67,13 @@ GPUS_PER_NODE=8 GPUS=8 bash tools/slurm_train.sh Dummy Test_job configs/selfsup/
 在第一台机器上:
 
 ```shell
-NNODES=2 NODE_RANK=0 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR bash tools/dist_train.sh $CONFIG $GPUS
+NNODES=2 NODE_RANK=0 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR sh tools/dist_train.sh $CONFIG $GPUS
 ```
 
 在第二台机器上:
 
 ```shell
-NNODES=2 NODE_RANK=1 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR bash tools/dist_train.sh $CONFIG $GPUS
+NNODES=2 NODE_RANK=1 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR sh tools/dist_train.sh $CONFIG $GPUS
 ```
 
 但是，如果您不使用高速网路连接这几台机器的话，训练将会非常慢。
@@ -87,8 +87,8 @@ NNODES=2 NODE_RANK=1 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR bash tools/dist_
 如果您使用  `dist_train.sh`  来启动训练任务:
 
 ```shell
-CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29500 bash tools/dist_train.sh ${CONFIG_FILE} 4 --work-dir tmp_work_dir_1
-CUDA_VISIBLE_DEVICES=4,5,6,7 PORT=29501 bash tools/dist_train.sh ${CONFIG_FILE} 4 --work-dir tmp_work_dir_2
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29500 sh tools/dist_train.sh ${CONFIG_FILE} 4 --work-dir tmp_work_dir_1
+CUDA_VISIBLE_DEVICES=4,5,6,7 PORT=29501 sh tools/dist_train.sh ${CONFIG_FILE} 4 --work-dir tmp_work_dir_2
 ```
 
 如果您使用 slurm 来启动训练任务，你有两种方式来为每个任务设置不同的端口:
@@ -110,8 +110,8 @@ dist_params = dict(backend='nccl', port=29501)
 然后您可以通过 config1.py 和 config2.py 来启动两个不同的任务.
 
 ```shell
-CUDA_VISIBLE_DEVICES=0,1,2,3 GPUS=4 bash tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config1.py tmp_work_dir_1
-CUDA_VISIBLE_DEVICES=4,5,6,7 GPUS=4 bash tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config2.py tmp_work_dir_2
+CUDA_VISIBLE_DEVICES=0,1,2,3 GPUS=4 sh tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config1.py tmp_work_dir_1
+CUDA_VISIBLE_DEVICES=4,5,6,7 GPUS=4 sh tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config2.py tmp_work_dir_2
 ```
 
 方法 2:
@@ -119,8 +119,8 @@ CUDA_VISIBLE_DEVICES=4,5,6,7 GPUS=4 bash tools/slurm_train.sh ${PARTITION} ${JOB
 除了修改配置文件之外, 您可以设置 `cfg-options` 来重写默认的端口号:
 
 ```shell
-CUDA_VISIBLE_DEVICES=0,1,2,3 GPUS=4 bash tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config1.py tmp_work_dir_1 --cfg-options dist_params.port=29500
-CUDA_VISIBLE_DEVICES=4,5,6,7 GPUS=4 bash tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config2.py tmp_work_dir_2 --cfg-options dist_params.port=29501
+CUDA_VISIBLE_DEVICES=0,1,2,3 GPUS=4 sh tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config1.py tmp_work_dir_1 --cfg-options dist_params.port=29500
+CUDA_VISIBLE_DEVICES=4,5,6,7 GPUS=4 sh tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config2.py tmp_work_dir_2 --cfg-options dist_params.port=29501
 ```
 
 ## 基准测试
@@ -163,27 +163,6 @@ python tools/analysis_tools/visualize_tsne.py ${CONFIG_FILE} --checkpoint ${CKPT
 - `CKPT_PATH`: 预训练模型的路径.
 - `WORK_DIR`: 保存可视化结果的路径.
 - `[optional arguments]`: 可选参数，具体可以参考 [visualize_tsne.py](../../tools/analysis_tools/visualize_tsne.py)
-
-### MAE 可视化
-
-我们提供了一个对 MAE 掩码效果和重建效果可视化可视化的方法:
-
-```shell
-python tools/misc/mae_visualization.py ${IMG} ${CONFIG_FILE} ${CKPT_PATH} --device ${DEVICE}
-```
-
-参数:
-
-- `IMG`: 用于可视化的图片
-- `CONFIG_FILE`: 训练预训练模型的参数配置文件.
-- `CKPT_PATH`: 预训练模型的路径.
-- `DEVICE`: 用于推理的设备.
-
-示例:
-
-```shell
-python tools/misc/mae_visualization.py tests/data/color.jpg configs/selfsup/mae/mae_vit-base-p16_8xb512-coslr-400e_in1k.py mae_epoch_400.pth --device 'cuda:0'
-```
 
 ### 可复现性
 

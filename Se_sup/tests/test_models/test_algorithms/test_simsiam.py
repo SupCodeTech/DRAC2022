@@ -1,10 +1,15 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import copy
 import platform
 
 import pytest
 import torch
 
 from mmselfsup.models.algorithms import SimSiam
+from mmselfsup.structures import SelfSupDataSample
+from mmselfsup.utils import register_all_modules
+
+register_all_modules()
 
 backbone = dict(
     type='ResNet',
@@ -24,6 +29,7 @@ neck = dict(
     norm_cfg=dict(type='BN1d'))
 head = dict(
     type='LatentPredictHead',
+    loss=dict(type='CosineSimilarityLoss'),
     predictor=dict(
         type='NonLinearNeck',
         in_channels=2,
@@ -37,24 +43,28 @@ head = dict(
 
 @pytest.mark.skipif(platform.system() == 'Windows', reason='Windows mem limit')
 def test_simsiam():
-    with pytest.raises(AssertionError):
-        alg = SimSiam(backbone=backbone, neck=neck, head=None)
+    data_preprocessor = {
+        'mean': (123.675, 116.28, 103.53),
+        'std': (58.395, 57.12, 57.375),
+        'bgr_to_rgb': True,
+    }
 
-    alg = SimSiam(backbone=backbone, neck=neck, head=head)
-    with pytest.raises(AssertionError):
-        fake_input = torch.randn((2, 3, 224, 224))
-        alg.forward_train(fake_input)
+    alg = SimSiam(
+        backbone=backbone,
+        neck=neck,
+        head=head,
+        data_preprocessor=copy.deepcopy(data_preprocessor))
 
-    fake_input = [torch.randn((2, 3, 224, 224)), torch.randn((2, 3, 224, 224))]
-    fake_out = alg.forward(fake_input)
-    assert fake_out['loss'].item() > -1
+    fake_data = {
+        'inputs':
+        [torch.randn((2, 3, 224, 224)),
+         torch.randn((2, 3, 224, 224))],
+        'data_sample': [SelfSupDataSample() for _ in range(2)]
+    }
+    fake_inputs, fake_data_samples = alg.data_preprocessor(fake_data)
+    fake_loss = alg(fake_inputs, fake_data_samples, mode='loss')
+    assert fake_loss['loss'] > -1
 
-    # test train step
-    fake_outputs = alg.train_step(dict(img=fake_input), None)
-    assert fake_outputs['loss'].item() > -1
-    assert fake_outputs['num_samples'] == 2
-
-    # test val step
-    fake_outputs = alg.val_step(dict(img=fake_input), None)
-    assert fake_outputs['loss'].item() > -1
-    assert fake_outputs['num_samples'] == 2
+    # test extract
+    fake_feat = alg(fake_inputs, fake_data_samples, mode='tensor')
+    assert fake_feat[0].size() == torch.Size([2, 512, 7, 7])

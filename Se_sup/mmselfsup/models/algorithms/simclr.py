@@ -1,89 +1,95 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import Dict, List, Tuple
+
 import torch
 
-from ..builder import ALGORITHMS, build_backbone, build_head, build_neck
+from mmselfsup.registry import MODELS
+from mmselfsup.structures import SelfSupDataSample
 from ..utils import GatherLayer
 from .base import BaseModel
 
 
-@ALGORITHMS.register_module()
+@MODELS.register_module()
 class SimCLR(BaseModel):
     """SimCLR.
 
-    Implementation of `A Simple Framework for Contrastive Learning
-    of Visual Representations <https://arxiv.org/abs/2002.05709>`_.
-
-    Args:
-        backbone (dict): Config dict for module of backbone.
-        neck (dict): Config dict for module of deep features to compact feature
-            vectors. Defaults to None.
-        head (dict): Config dict for module of loss functions.
-            Defaults to None.
+    Implementation of `A Simple Framework for Contrastive Learning of Visual
+    Representations <https://arxiv.org/abs/2002.05709>`_.
     """
 
-    def __init__(self, backbone, neck=None, head=None, init_cfg=None):
-        super(SimCLR, self).__init__(init_cfg)
-        self.backbone = build_backbone(backbone)
-        assert neck is not None
-        self.neck = build_neck(neck)
-        assert head is not None
-        self.head = build_head(head)
-
     @staticmethod
-    def _create_buffer(N):
+    def _create_buffer(
+        batch_size: int, device: torch.device
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """Compute the mask and the index of positive samples.
 
         Args:
-            N (int): batch size.
-        """
-        mask = 1 - torch.eye(N * 2, dtype=torch.uint8).cuda()
-        pos_ind = (torch.arange(N * 2).cuda(),
-                   2 * torch.arange(N, dtype=torch.long).unsqueeze(1).repeat(
-                       1, 2).view(-1, 1).squeeze().cuda())
-        neg_mask = torch.ones((N * 2, N * 2 - 1), dtype=torch.uint8).cuda()
-        neg_mask[pos_ind] = 0
-        return mask, pos_ind, neg_mask
+            batch_size (int): The batch size.
+            device (torch.device): The device of backend.
 
-    def extract_feat(self, img):
+        Returns:
+            Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+            - The mask for feature selection.
+            - The index of positive samples.
+            - The mask of negative samples.
+        """
+        mask = 1 - torch.eye(batch_size * 2, dtype=torch.uint8).to(device)
+        pos_idx = (
+            torch.arange(batch_size * 2).to(device),
+            2 * torch.arange(batch_size, dtype=torch.long).unsqueeze(1).repeat(
+                1, 2).view(-1, 1).squeeze().to(device))
+        neg_mask = torch.ones((batch_size * 2, batch_size * 2 - 1),
+                              dtype=torch.uint8).to(device)
+        neg_mask[pos_idx] = 0
+        return mask, pos_idx, neg_mask
+
+    def extract_feat(self, inputs: List[torch.Tensor],
+                     **kwargs) -> Tuple[torch.Tensor]:
         """Function to extract features from backbone.
 
         Args:
-            img (Tensor): Input images of shape (N, C, H, W).
-                Typically these should be mean centered and std scaled.
+            inputs (List[torch.Tensor]): The input images.
 
         Returns:
-            tuple[Tensor]: backbone outputs.
+            Tuple[torch.Tensor]: Backbone outputs.
         """
-        x = self.backbone(img)
+        x = self.backbone(inputs[0])
         return x
 
-    def forward_train(self, img, **kwargs):
-        """Forward computation during training.
+    def loss(self, inputs: List[torch.Tensor],
+             data_samples: List[SelfSupDataSample],
+             **kwargs) -> Dict[str, torch.Tensor]:
+        """The forward function in training.
 
         Args:
-            img (list[Tensor]): A list of input images with shape
-                (N, C, H, W). Typically these should be mean centered
-                and std scaled.
+            inputs (List[torch.Tensor]): The input images.
+            data_samples (List[SelfSupDataSample]): All elements required
+                during the forward function.
 
         Returns:
-            dict[str, Tensor]: A dictionary of loss components.
+            Dict[str, torch.Tensor]: A dictionary of loss components.
         """
-        assert isinstance(img, list)
-        img = torch.stack(img, 1)
-        img = img.reshape(
-            (img.size(0) * 2, img.size(2), img.size(3), img.size(4)))
-        x = self.extract_feat(img)  # 2n
+        assert isinstance(inputs, list)
+        inputs = torch.stack(inputs, 1)
+        inputs = inputs.reshape((inputs.size(0) * 2, inputs.size(2),
+                                 inputs.size(3), inputs.size(4)))
+        x = self.backbone(inputs)
         z = self.neck(x)[0]  # (2n)xd
+
         z = z / (torch.norm(z, p=2, dim=1, keepdim=True) + 1e-10)
         z = torch.cat(GatherLayer.apply(z), dim=0)  # (2N)xd
         assert z.size(0) % 2 == 0
         N = z.size(0) // 2
         s = torch.matmul(z, z.permute(1, 0))  # (2N)x(2N)
-        mask, pos_ind, neg_mask = self._create_buffer(N)
+        mask, pos_idx, neg_mask = self._create_buffer(N, s.device)
+
         # remove diagonal, (2N)x(2N-1)
         s = torch.masked_select(s, mask == 1).reshape(s.size(0), -1)
-        positive = s[pos_ind].unsqueeze(1)  # (2N)x1
+        positive = s[pos_idx].unsqueeze(1)  # (2N)x1
+
         # select negative, (2N)x(2N-2)
         negative = torch.masked_select(s, neg_mask == 1).reshape(s.size(0), -1)
-        losses = self.head(positive, negative)
+
+        loss = self.head(positive, negative)
+        losses = dict(loss=loss)
         return losses

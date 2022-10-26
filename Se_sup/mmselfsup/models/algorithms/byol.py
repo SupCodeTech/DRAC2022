@@ -1,100 +1,103 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import Dict, List, Optional, Tuple, Union
+
 import torch
 import torch.nn as nn
 
-from ..builder import ALGORITHMS, build_backbone, build_head, build_neck
+from mmselfsup.registry import MODELS
+from mmselfsup.structures import SelfSupDataSample
+from ..utils import CosineEMA
 from .base import BaseModel
 
 
-@ALGORITHMS.register_module()
+@MODELS.register_module()
 class BYOL(BaseModel):
     """BYOL.
 
     Implementation of `Bootstrap Your Own Latent: A New Approach to
     Self-Supervised Learning <https://arxiv.org/abs/2006.07733>`_.
-    The momentum adjustment is in `core/hooks/byol_hook.py`.
 
     Args:
         backbone (dict): Config dict for module of backbone.
-        neck (dict): Config dict for module of deep features to compact
-            feature vectors. Defaults to None.
-        head (dict): Config dict for module of loss functions.
-            Defaults to None.
+        neck (dict): Config dict for module of deep features
+            to compact feature vectors.
+        head (dict): Config dict for module of head functions.
         base_momentum (float): The base momentum coefficient for the target
             network. Defaults to 0.996.
+        pretrained (str, optional): The pretrained checkpoint path, support
+            local path and remote path. Defaults to None.
+        data_preprocessor (dict, optional): The config for preprocessing
+            input data. If None or no specified type, it will use
+            "SelfSupDataPreprocessor" as type.
+            See :class:`SelfSupDataPreprocessor` for more details.
+            Defaults to None.
+        init_cfg (Union[List[dict], dict], optional): Config dict for weight
+            initialization. Defaults to None.
     """
 
     def __init__(self,
-                 backbone,
-                 neck=None,
-                 head=None,
-                 base_momentum=0.996,
-                 init_cfg=None,
-                 **kwargs):
-        super(BYOL, self).__init__(init_cfg)
-        assert neck is not None
-        self.online_net = nn.Sequential(
-            build_backbone(backbone), build_neck(neck))
-        self.target_net = nn.Sequential(
-            build_backbone(backbone), build_neck(neck))
+                 backbone: dict,
+                 neck: dict,
+                 head: dict,
+                 base_momentum: float = 0.996,
+                 pretrained: Optional[str] = None,
+                 data_preprocessor: Optional[dict] = None,
+                 init_cfg: Optional[Union[List[dict], dict]] = None) -> None:
+        super().__init__(
+            backbone=backbone,
+            neck=neck,
+            head=head,
+            pretrained=pretrained,
+            data_preprocessor=data_preprocessor,
+            init_cfg=init_cfg)
 
-        for param_ol, param_tgt in zip(self.online_net.parameters(),
-                                       self.target_net.parameters()):
-            param_tgt.data.copy_(param_ol.data)
-            param_tgt.requires_grad = False
+        # create momentum model
+        self.target_net = CosineEMA(
+            nn.Sequential(self.backbone, self.neck), momentum=base_momentum)
 
-        self.backbone = self.online_net[0]
-        self.neck = self.online_net[1]
-        assert head is not None
-        self.head = build_head(head)
-
-        self.base_momentum = base_momentum
-        self.momentum = base_momentum
-
-    @torch.no_grad()
-    def momentum_update(self):
-        """Momentum update of the target network."""
-        for param_ol, param_tgt in zip(self.online_net.parameters(),
-                                       self.target_net.parameters()):
-            param_tgt.data = param_tgt.data * self.momentum + \
-                             param_ol.data * (1. - self.momentum)
-
-    def extract_feat(self, img):
+    def extract_feat(self, inputs: List[torch.Tensor],
+                     **kwargs) -> Tuple[torch.Tensor]:
         """Function to extract features from backbone.
 
         Args:
-            img (Tensor): Input images of shape (N, C, H, W).
-                Typically these should be mean centered and std scaled.
+            batch_inputs (List[torch.Tensor]): The input images.
 
         Returns:
-            tuple[Tensor]: backbone outputs.
+            Tuple[torch.Tensor]: Backbone outputs.
         """
-        x = self.backbone(img)
+        x = self.backbone(inputs[0])
         return x
 
-    def forward_train(self, img, **kwargs):
-        """Forward computation during training.
+    def loss(self, inputs: List[torch.Tensor],
+             data_samples: List[SelfSupDataSample],
+             **kwargs) -> Dict[str, torch.Tensor]:
+        """The forward function in training.
 
         Args:
-            img (list[Tensor]): A list of input images with shape
-                (N, C, H, W). Typically these should be mean centered
-                and std scaled.
+            inputs (List[torch.Tensor]): The input images.
+            data_samples (List[SelfSupDataSample]): All elements required
+                during the forward function.
 
         Returns:
-            dict[str, Tensor]: A dictionary of loss components.
+            Dict[str, torch.Tensor]: A dictionary of loss components.
         """
-        assert isinstance(img, list)
-        img_v1 = img[0]
-        img_v2 = img[1]
+        assert isinstance(inputs, list)
+        img_v1 = inputs[0]
+        img_v2 = inputs[1]
         # compute online features
-        proj_online_v1 = self.online_net(img_v1)[0]
-        proj_online_v2 = self.online_net(img_v2)[0]
+        proj_online_v1 = self.neck(self.backbone(img_v1))[0]
+        proj_online_v2 = self.neck(self.backbone(img_v2))[0]
         # compute target features
         with torch.no_grad():
+            # update the target net
+            self.target_net.update_parameters(
+                nn.Sequential(self.backbone, self.neck))
+
             proj_target_v1 = self.target_net(img_v1)[0]
             proj_target_v2 = self.target_net(img_v2)[0]
 
-        losses = 2. * (
-            self.head(proj_online_v1, proj_target_v2)['loss'] +
-            self.head(proj_online_v2, proj_target_v1)['loss'])
-        return dict(loss=losses)
+        loss_1 = self.head(proj_online_v1, proj_target_v2)
+        loss_2 = self.head(proj_online_v2, proj_target_v1)
+
+        losses = dict(loss=2. * (loss_1 + loss_2))
+        return losses

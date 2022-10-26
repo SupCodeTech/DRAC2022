@@ -4,12 +4,12 @@ from typing import Optional, Sequence, Tuple, Union
 import torch
 import torch.nn as nn
 from mmcls.models import SwinTransformer
-from mmcv.cnn.utils.weight_init import trunc_normal_
+from mmengine.model.weight_init import trunc_normal_
 
-from ..builder import BACKBONES
+from mmselfsup.registry import MODELS
 
 
-@BACKBONES.register_module()
+@MODELS.register_module()
 class SimMIMSwinTransformer(SwinTransformer):
     """Swin Transformer for SimMIM.
 
@@ -42,6 +42,11 @@ class SimMIMSwinTransformer(SwinTransformer):
             stage. Defaults to empty dict.
         patch_cfg (dict): Extra config dict for patch embedding.
             Defaults to empty dict.
+        pad_small_map (bool): If True, pad the small feature map to the window
+            size, which is common used in detection and segmentation. If False,
+            avoid shifting window and shrink the window size to the size of
+            feature map, which is common used in classification.
+            Defaults to False.
         init_cfg (dict, optional): The Config for initialization.
             Defaults to None.
     """
@@ -60,6 +65,7 @@ class SimMIMSwinTransformer(SwinTransformer):
                  norm_cfg: dict = dict(type='LN'),
                  stage_cfgs: Union[Sequence, dict] = dict(),
                  patch_cfg: dict = dict(),
+                 pad_small_map: bool = False,
                  init_cfg: Optional[dict] = None) -> None:
         super().__init__(
             arch=arch,
@@ -75,13 +81,14 @@ class SimMIMSwinTransformer(SwinTransformer):
             norm_cfg=norm_cfg,
             stage_cfgs=stage_cfgs,
             patch_cfg=patch_cfg,
+            pad_small_map=pad_small_map,
             init_cfg=init_cfg)
 
         self.mask_token = nn.Parameter(torch.zeros(1, 1, self.embed_dims))
 
     def init_weights(self) -> None:
         """Initialize weights."""
-        super(SwinTransformer, self).init_weights()
+        super().init_weights()
 
         if (isinstance(self.init_cfg, dict)
                 and self.init_cfg['type'] == 'Pretrained'):
@@ -96,6 +103,7 @@ class SimMIMSwinTransformer(SwinTransformer):
         self.apply(self._init_weights)
 
     def _init_weights(self, m):
+        """Initialize weights."""
         if isinstance(m, nn.Linear):
             trunc_normal_(m.weight, std=.02)
             if isinstance(m, nn.Linear) and m.bias is not None:

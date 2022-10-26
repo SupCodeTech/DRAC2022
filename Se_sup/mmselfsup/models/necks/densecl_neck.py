@@ -1,11 +1,14 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import List, Optional, Union
+
+import torch
 import torch.nn as nn
-from mmcv.runner import BaseModule
+from mmengine.model import BaseModule
 
-from ..builder import NECKS
+from mmselfsup.registry import MODELS
 
 
-@NECKS.register_module()
+@MODELS.register_module()
 class DenseCLNeck(BaseModule):
     """The non-linear neck of DenseCL.
 
@@ -22,12 +25,12 @@ class DenseCLNeck(BaseModule):
     """
 
     def __init__(self,
-                 in_channels,
-                 hid_channels,
-                 out_channels,
-                 num_grid=None,
-                 init_cfg=None):
-        super(DenseCLNeck, self).__init__(init_cfg)
+                 in_channels: int,
+                 hid_channels: int,
+                 out_channels: int,
+                 num_grid: Optional[int] = None,
+                 init_cfg: Optional[Union[dict, List[dict]]] = None) -> None:
+        super().__init__(init_cfg)
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.mlp = nn.Sequential(
             nn.Linear(in_channels, hid_channels), nn.ReLU(inplace=True),
@@ -41,11 +44,18 @@ class DenseCLNeck(BaseModule):
             nn.Conv2d(hid_channels, out_channels, 1))
         self.avgpool2 = nn.AdaptiveAvgPool2d((1, 1))
 
-    def forward(self, x):
+    def forward(self, x: List[torch.Tensor]) -> List[torch.Tensor]:
         """Forward function of neck.
 
         Args:
-            x (list[tensor]): feature map of backbone.
+            x (List[torch.Tensor]): feature map of backbone.
+
+        Returns:
+            List[torch.Tensor, torch.Tensor, torch.Tensor]: The global feature
+                vectors and dense feature vectors.
+                - avgpooled_x: Global feature vectors.
+                - x: Dense feature vectors.
+                - avgpooled_x2: Dense feature vectors for queue.
         """
         assert len(x) == 1
         x = x[0]

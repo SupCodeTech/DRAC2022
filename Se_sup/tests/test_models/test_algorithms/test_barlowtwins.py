@@ -1,20 +1,25 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import copy
 import platform
 
 import pytest
 import torch
 
-from mmselfsup.models.algorithms import BarlowTwins
+from mmselfsup.models import BarlowTwins
+from mmselfsup.structures import SelfSupDataSample
+from mmselfsup.utils import register_all_modules
+
+register_all_modules()
 
 backbone = dict(
     type='ResNet',
-    depth=50,
+    depth=18,
     in_channels=3,
     out_indices=[4],  # 0: conv-1, x: stage-x
     norm_cfg=dict(type='BN'))
 neck = dict(
     type='NonLinearNeck',
-    in_channels=2048,
+    in_channels=512,
     hid_channels=2,
     out_channels=2,
     num_layers=3,
@@ -22,23 +27,35 @@ neck = dict(
     with_last_bn_affine=False,
     with_avg_pool=True,
     norm_cfg=dict(type='BN1d'))
-head = dict(type='LatentCrossCorrelationHead', in_channels=2)
+head = dict(
+    type='LatentCrossCorrelationHead',
+    in_channels=2,
+    loss=dict(type='CrossCorrelationLoss'))
 
 
 @pytest.mark.skipif(platform.system() == 'Windows', reason='Windows mem limit')
 def test_barlowtwins():
-    with pytest.raises(AssertionError):
-        alg = BarlowTwins(backbone=backbone, neck=None, head=head)
-    with pytest.raises(AssertionError):
-        alg = BarlowTwins(backbone=backbone, neck=neck, head=None)
+    data_preprocessor = {
+        'mean': (123.675, 116.28, 103.53),
+        'std': (58.395, 57.12, 57.375),
+        'bgr_to_rgb': True
+    }
+    alg = BarlowTwins(
+        backbone=backbone,
+        neck=neck,
+        head=head,
+        data_preprocessor=copy.deepcopy(data_preprocessor))
 
-    alg = BarlowTwins(backbone=backbone, neck=neck, head=head)
-    fake_input = torch.randn((2, 3, 224, 224))
-    fake_backbone_out = alg.extract_feat(fake_input)
-    assert fake_backbone_out[0].size() == torch.Size([2, 2048, 7, 7])
-    with pytest.raises(AssertionError):
-        fake_out = alg.forward_train(fake_input)
+    fake_data = {
+        'inputs':
+        [torch.randn((2, 3, 224, 224)),
+         torch.randn((2, 3, 224, 224))],
+        'data_sample': [SelfSupDataSample() for _ in range(2)]
+    }
 
-    fake_input = [torch.randn((2, 3, 224, 224)), torch.randn((2, 3, 224, 224))]
-    fake_out = alg.forward_train(fake_input)
-    assert fake_out['loss'].item() > 0.0
+    fake_inputs, fake_data_samples = alg.data_preprocessor(fake_data)
+    fake_loss = alg(fake_inputs, fake_data_samples, mode='loss')
+    assert isinstance(fake_loss['loss'].item(), float)
+
+    fake_feats = alg(fake_inputs, fake_data_samples, mode='tensor')
+    assert list(fake_feats[0].shape) == [2, 512, 7, 7]

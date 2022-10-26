@@ -1,159 +1,167 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from abc import ABCMeta, abstractmethod
-from collections import OrderedDict
+from typing import List, Optional, Union
 
 import torch
-import torch.distributed as dist
-from mmcv.runner import BaseModule, auto_fp16
+from mmengine.model import BaseModel as _BaseModel
+from torch import nn
+
+from mmselfsup.registry import MODELS
+from mmselfsup.structures import SelfSupDataSample
 
 
-class BaseModel(BaseModule, metaclass=ABCMeta):
-    """Base model class for self-supervised learning."""
+class BaseModel(_BaseModel):
+    """BaseModel for SelfSup.
 
-    def __init__(self, init_cfg=None):
-        super(BaseModel, self).__init__(init_cfg)
-        self.fp16_enabled = False
+    All algorithms should inherit this module.
+
+    Args:
+        backbone (dict): The backbone module. See
+            :mod:`mmcls.models.backbones`.
+        neck (dict, optional): The neck module to process features from
+            backbone. See :mod:`mmcls.models.necks`. Defaults to None.
+        head (dict, optional): The head module to do prediction and calculate
+            loss from processed features. See :mod:`mmcls.models.heads`.
+            Notice that if the head is not set, almost all methods cannot be
+            used except :meth:`extract_feat`. Defaults to None.
+        pretrained (str, optional): The pretrained checkpoint path, support
+            local path and remote path. Defaults to None.
+        data_preprocessor (Union[dict, nn.Module], optional): The config for
+            preprocessing input data. If None or no specified type, it will use
+            "SelfSupDataPreprocessor" as type.
+            See :class:`SelfSupDataPreprocessor` for more details.
+            Defaults to None.
+        init_cfg (dict, optional): the config to control the initialization.
+            Defaults to None.
+    """
+
+    def __init__(self,
+                 backbone: dict,
+                 neck: Optional[dict] = None,
+                 head: Optional[dict] = None,
+                 pretrained: Optional[str] = None,
+                 data_preprocessor: Optional[Union[dict, nn.Module]] = None,
+                 init_cfg: Optional[dict] = None):
+
+        if pretrained is not None:
+            init_cfg = dict(type='Pretrained', checkpoint=pretrained)
+
+        if data_preprocessor is None:
+            data_preprocessor = {}
+        # The build process is in MMEngine, so we need to add scope here.
+        data_preprocessor.setdefault('type',
+                                     'mmselfsup.SelfSupDataPreprocessor')
+
+        super().__init__(
+            init_cfg=init_cfg, data_preprocessor=data_preprocessor)
+
+        self.backbone = MODELS.build(backbone)
+
+        if neck is not None:
+            self.neck = MODELS.build(neck)
+
+        if head is not None:
+            self.head = MODELS.build(head)
 
     @property
-    def with_neck(self):
+    def with_neck(self) -> bool:
         return hasattr(self, 'neck') and self.neck is not None
 
     @property
-    def with_head(self):
+    def with_head(self) -> bool:
         return hasattr(self, 'head') and self.head is not None
 
-    @abstractmethod
-    def extract_feat(self, imgs):
-        """Function to extract features from backbone.
+    def forward(self,
+                inputs: torch.Tensor,
+                data_samples: Optional[List[SelfSupDataSample]] = None,
+                mode: str = 'tensor'):
+        """Returns losses or predictions of training, validation, testing, and
+        simple inference process.
+
+        This module overwrites the abstract method in ``BaseModel``.
 
         Args:
-            img (Tensor): Input images. Typically these should be mean centered
-            and std scaled.
-        """
-        pass
-
-    @abstractmethod
-    def forward_train(self, imgs, **kwargs):
-        """
-        Args:
-            img ([Tensor): List of tensors. Typically these should be
-                mean centered and std scaled.
-            kwargs (keyword arguments): Specific to concrete implementation.
-        """
-        pass
-
-    def forward_test(self, imgs, **kwargs):
-        """
-        Args:
-            img (Tensor): List of tensors. Typically these should be
-                mean centered and std scaled.
-            kwargs (keyword arguments): Specific to concrete implementation.
-        """
-        pass
-
-    @auto_fp16(apply_to=('img', ))
-    def forward(self, img, mode='train', **kwargs):
-        """Forward function of model.
-
-        Calls either forward_train, forward_test or extract_feat function
-        according to the mode.
-        """
-        if mode == 'train':
-            return self.forward_train(img, **kwargs)
-        elif mode == 'test':
-            return self.forward_test(img, **kwargs)
-        elif mode == 'extract':
-            return self.extract_feat(img)
-        else:
-            raise Exception(f'No such mode: {mode}')
-
-    def _parse_losses(self, losses):
-        """Parse the raw outputs (losses) of the network.
-
-        Args:
-            losses (dict): Raw output of the network, which usually contain
-                losses and other necessary information.
+            inputs (torch.Tensor): batch input tensor collated by
+                :attr:`data_preprocessor`.
+            data_samples (List[BaseDataElement], optional):
+                data samples collated by :attr:`data_preprocessor`.
+            mode (str): mode should be one of ``loss``, ``predict`` and
+                ``tensor``
+                - ``loss``: Called by ``train_step`` and return loss ``dict``
+                  used for logging
+                - ``predict``: Called by ``val_step`` and ``test_step``
+                  and return list of ``BaseDataElement`` results used for
+                  computing metric.
+                - ``tensor``: Called by custom use to get ``Tensor`` type
+                  results.
         Returns:
-            tuple[Tensor, dict]: (loss, log_vars), loss is the loss tensor
-                which may be a weighted sum of all losses, log_vars contains
-                all the variables to be sent to the logger.
+            ForwardResults:
+                - If ``mode == loss``, return a ``dict`` of loss tensor used
+                  for backward and logging.
+                - If ``mode == predict``, return a ``list`` of
+                  :obj:`BaseDataElement` for computing metric
+                  and getting inference result.
+                - If ``mode == tensor``, return a tensor or ``tuple`` of tensor
+                  or ``dict of tensor for custom use.
         """
-        log_vars = OrderedDict()
-        for loss_name, loss_value in losses.items():
-            if isinstance(loss_value, torch.Tensor):
-                log_vars[loss_name] = loss_value.mean()
-            elif isinstance(loss_value, list):
-                log_vars[loss_name] = sum(_loss.mean() for _loss in loss_value)
-            elif isinstance(loss_value, dict):
-                for name, value in loss_value.items():
-                    log_vars[name] = value
-            else:
-                raise TypeError(
-                    f'{loss_name} is not a tensor or list of tensors')
+        if mode == 'tensor':
+            feats = self.extract_feat(inputs)
+            return feats
+        elif mode == 'loss':
+            return self.loss(inputs, data_samples)
+        elif mode == 'predict':
+            return self.predict(inputs, data_samples)
+        else:
+            raise RuntimeError(f'Invalid mode "{mode}".')
 
-        loss = sum(_value for _key, _value in log_vars.items()
-                   if 'loss' in _key)
+    def extract_feat(self, inputs):
+        """Extract features from the input tensor with shape (N, C, ...).
 
-        log_vars['loss'] = loss
-        for loss_name, loss_value in log_vars.items():
-            # reduce loss when distributed training
-            if dist.is_available() and dist.is_initialized():
-                loss_value = loss_value.data.clone()
-                dist.all_reduce(loss_value.div_(dist.get_world_size()))
-            log_vars[loss_name] = loss_value.item()
-
-        return loss, log_vars
-
-    def train_step(self, data, optimizer):
-        """The iteration step during training.
-
-        This method defines an iteration step during training, except for the
-        back propagation and optimizer updating, which are done in an optimizer
-        hook. Note that in some complicated cases or models, the whole process
-        including back propagation and optimizer updating are also defined in
-        this method, such as GAN.
+        This is a abstract method, and subclass should overwrite this methods
+        if needed.
 
         Args:
-            data (dict): The output of dataloader.
-            optimizer (:obj:`torch.optim.Optimizer` | dict): The optimizer of
-                runner is passed to ``train_step()``. This argument is unused
-                and reserved.
+            inputs (Tensor): A batch of inputs. The shape of it should be
+                ``(num_samples, num_channels, *img_shape)``.
 
         Returns:
-            dict: Dict of outputs. The following fields are contained.
-                - loss (torch.Tensor): A tensor for back propagation, which \
-                    can be a weighted sum of multiple losses.
-                - log_vars (dict): Dict contains all the variables to be sent \
-                    to the logger.
-                - num_samples (int): Indicates the batch size (when the model \
-                    is DDP, it means the batch size on each GPU), which is \
-                    used for averaging the logs.
+            tuple | Tensor: The output of specified stage.
+            The output depends on detailed implementation.
         """
-        losses = self(**data)
-        loss, log_vars = self._parse_losses(losses)
+        raise NotImplementedError
 
-        if isinstance(data['img'], list):
-            num_samples = len(data['img'][0].data)
-        else:
-            num_samples = len(data['img'].data)
-        outputs = dict(loss=loss, log_vars=log_vars, num_samples=num_samples)
+    def loss(self, inputs: torch.Tensor,
+             data_samples: List[SelfSupDataSample]) -> dict:
+        """Calculate losses from a batch of inputs and data samples.
 
-        return outputs
+        This is a abstract method, and subclass should overwrite this methods
+        if needed.
 
-    def val_step(self, data, optimizer):
-        """The iteration step during validation.
+        Args:
+            inputs (torch.Tensor): The input tensor with shape
+                (N, C, ...) in general.
+            data_samples (List[SelfSupDataSample]): The annotation data of
+                every samples.
 
-        This method shares the same signature as :func:`train_step`, but used
-        during val epochs. Note that the evaluation after training epochs is
-        not implemented with this method, but an evaluation hook.
+        Returns:
+            dict[str, Tensor]: A dictionary of loss components.
         """
-        losses = self(**data)
-        loss, log_vars = self._parse_losses(losses)
+        raise NotImplementedError
 
-        if isinstance(data['img'], list):
-            num_samples = len(data['img'][0].data)
-        else:
-            num_samples = len(data['img'].data)
-        outputs = dict(loss=loss, log_vars=log_vars, num_samples=num_samples)
+    def predict(self,
+                inputs: tuple,
+                data_samples: Optional[List[SelfSupDataSample]] = None,
+                **kwargs) -> List[SelfSupDataSample]:
+        """Predict results from the extracted features.
 
-        return outputs
+        This module returns the logits before loss, which are used to compute
+        all kinds of metrics. This is a abstract method, and subclass should
+        overwrite this methods if needed.
+
+        Args:
+            feats (tuple): The features extracted from the backbone.
+            data_samples (List[BaseDataElement], optional): The annotation
+                data of every samples. Defaults to None.
+            **kwargs: Other keyword arguments accepted by the ``predict``
+                method of :attr:`head`.
+        """
+        raise NotImplementedError
