@@ -1,12 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
 import torch.nn as nn
-from mmengine.model import BaseModule
+from mmcv.runner import BaseModule
 
-from mmselfsup.registry import MODELS
+from ..builder import NECKS
 
 
-@MODELS.register_module()
+@NECKS.register_module()
 class SimMIMNeck(BaseModule):
     """Pre-train Neck For SimMIM.
 
@@ -18,7 +18,7 @@ class SimMIMNeck(BaseModule):
     """
 
     def __init__(self, in_channels: int, encoder_stride: int) -> None:
-        super().__init__()
+        super(SimMIMNeck, self).__init__()
         self.decoder = nn.Sequential(
             nn.Conv2d(
                 in_channels=in_channels,
@@ -28,7 +28,7 @@ class SimMIMNeck(BaseModule):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward function."""
+
         x = self.decoder(x)
 
         return x

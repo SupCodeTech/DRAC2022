@@ -11,6 +11,7 @@ PY_ARGS=${@:5}
 GPUS=${GPUS:-8}
 GPUS_PER_NODE=${GPUS_PER_NODE:-8}
 CPUS_PER_TASK=${CPUS_PER_TASK:-5}
+PORT=${PORT:-29500}
 SRUN_ARGS=${SRUN_ARGS:-""}
 
 WORK_DIR=$(echo ${CFG%.*} | sed -e "s/configs/work_dirs/g")/
@@ -31,4 +32,5 @@ srun -p ${PARTITION} \
     ${SRUN_ARGS} \
     python -u tools/benchmarks/classification/knn_imagenet/test_knn.py $CFG \
         --checkpoint $WORK_DIR/epoch_${EPOCH}.pth \
+        --cfg-options dist_params.port=$PORT \
         --work-dir $WORK_DIR --launcher="slurm" ${PY_ARGS}

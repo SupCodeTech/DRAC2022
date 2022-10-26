@@ -1,121 +1,118 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Dict, List, Optional, Tuple, Union
-
+import numpy as np
 import torch
-from mmengine.structures import LabelData
+import torch.nn as nn
 
-from mmselfsup.registry import MODELS
-from mmselfsup.structures import SelfSupDataSample
+from ..builder import ALGORITHMS, build_backbone, build_head, build_neck
+from ..utils import Sobel
 from .base import BaseModel
 
 
-@MODELS.register_module()
+@ALGORITHMS.register_module()
 class DeepCluster(BaseModel):
     """DeepCluster.
 
     Implementation of `Deep Clustering for Unsupervised Learning
     of Visual Features <https://arxiv.org/abs/1807.05520>`_.
-    The clustering operation is in `engine/hooks/deepcluster_hook.py`.
+    The clustering operation is in `core/hooks/deepcluster_hook.py`.
 
     Args:
         backbone (dict): Config dict for module of backbone.
-        neck (dict): Config dict for module of deep features to compact
-            feature vectors.
-        head (dict): Config dict for module of head functions.
-        pretrained (str, optional): The pretrained checkpoint path, support
-            local path and remote path. Defaults to None.
-        data_preprocessor (dict, optional): The config for preprocessing
-            input data. If None or no specified type, it will use
-            "SelfSupDataPreprocessor" as type.
-            See :class:`SelfSupDataPreprocessor` for more details.
+        with_sobel (bool): Whether to apply a Sobel filter on images.
+            Defaults to True.
+        neck (dict): Config dict for module of deep features to compact feature
+            vectors. Defaults to None.
+        head (dict): Config dict for module of loss functions.
             Defaults to None.
-        init_cfg (Union[List[dict], dict], optional): Config dict for weight
-            initialization. Defaults to None.
     """
 
     def __init__(self,
-                 backbone: dict,
-                 neck: dict,
-                 head: dict,
-                 pretrained: Optional[str] = None,
-                 data_preprocessor: Optional[dict] = None,
-                 init_cfg: Optional[Union[List[dict], dict]] = None) -> None:
-        super().__init__(
-            backbone=backbone,
-            neck=neck,
-            head=head,
-            pretrained=pretrained,
-            data_preprocessor=data_preprocessor,
-            init_cfg=init_cfg)
+                 backbone,
+                 with_sobel=True,
+                 neck=None,
+                 head=None,
+                 init_cfg=None):
+        super(DeepCluster, self).__init__(init_cfg)
+        self.with_sobel = with_sobel
+        if with_sobel:
+            self.sobel_layer = Sobel()
+        self.backbone = build_backbone(backbone)
+        if neck is not None:
+            self.neck = build_neck(neck)
+        assert head is not None
+        self.head = build_head(head)
 
         # re-weight
         self.num_classes = self.head.num_classes
-        self.register_buffer(
-            'loss_weight', torch.ones((self.num_classes, ),
-                                      dtype=torch.float32))
+        self.loss_weight = torch.ones((self.num_classes, ),
+                                      dtype=torch.float32)
         self.loss_weight /= self.loss_weight.sum()
 
-    def extract_feat(self, inputs: List[torch.Tensor],
-                     **kwarg) -> Tuple[torch.Tensor]:
+    def extract_feat(self, img):
         """Function to extract features from backbone.
 
         Args:
-            inputs (List[torch.Tensor]): The input images.
-            data_samples (List[SelfSupDataSample]): All elements required
-                during the forward function.
+            img (Tensor): Input images of shape (N, C, H, W).
+                Typically these should be mean centered and std scaled.
 
         Returns:
-            Tuple[torch.Tensor]: Backbone outputs.
+            tuple[Tensor]: backbone outputs.
         """
-        x = self.backbone(inputs[0])
+        if self.with_sobel:
+            img = self.sobel_layer(img)
+        x = self.backbone(img)
         return x
 
-    def loss(self, inputs: List[torch.Tensor],
-             data_samples: List[SelfSupDataSample],
-             **kwargs) -> Dict[str, torch.Tensor]:
-        """The forward function in training.
+    def forward_train(self, img, pseudo_label, **kwargs):
+        """Forward computation during training.
 
         Args:
-            inputs (List[torch.Tensor]): The input images.
-            data_samples (List[SelfSupDataSample]): All elements required
-                during the forward function.
+            img (Tensor): Input images of shape (N, C, H, W).
+                Typically these should be mean centered and std scaled.
+            pseudo_label (Tensor): Label assignments.
+            kwargs: Any keyword arguments to be used to forward.
 
         Returns:
-            Dict[str, torch.Tensor]: A dictionary of loss components.
+            dict[str, Tensor]: A dictionary of loss components.
         """
-        pseudo_label = torch.cat([
-            data_sample.pseudo_label.clustering_label
-            for data_sample in data_samples
-        ])
-        x = self.extract_feat(inputs)
+        x = self.extract_feat(img)
         if self.with_neck:
             x = self.neck(x)
-        self.head.loss.class_weight = self.loss_weight
-        loss = self.head(x, pseudo_label)
-        losses = dict(loss=loss)
+        outs = self.head(x)
+        loss_inputs = (outs, pseudo_label)
+        losses = self.head.loss(*loss_inputs)
         return losses
 
-    def predict(self, inputs: List[torch.Tensor],
-                data_samples: List[SelfSupDataSample],
-                **kwargs) -> List[SelfSupDataSample]:
-        """The forward function in testing.
+    def forward_test(self, img, **kwargs):
+        """Forward computation during test.
 
         Args:
-            inputs (List[torch.Tensor]): The input images.
-            data_samples (List[SelfSupDataSample]): All elements required
-                during the forward function.
+            img (Tensor): Input images of shape (N, C, H, W).
+                Typically these should be mean centered and std scaled.
 
         Returns:
-            List[SelfSupDataSample]: The prediction from model.
+            dict[str, Tensor]: A dictionary of output features.
         """
-        x = self.extract_feat(inputs)  # tuple
+        x = self.extract_feat(img)  # tuple
         if self.with_neck:
             x = self.neck(x)
-        outs = self.head.logits(x)
-        keys = [f'head{i}' for i in self.backbone.out_indices]
+        outs = self.head(x)
+        keys = [f'head{i}' for i in range(len(outs))]
+        out_tensors = [out.cpu() for out in outs]  # NxC
+        return dict(zip(keys, out_tensors))
 
-        for i in range(len(outs)):
-            prediction_data = {key: out for key, out in zip(keys, outs)}
-            prediction = LabelData(**prediction_data)
-            data_samples[i].pred_label = prediction
-        return data_samples
+    def set_reweight(self, labels, reweight_pow=0.5):
+        """Loss re-weighting.
+
+        Re-weighting the loss according to the number of samples in each class.
+
+        Args:
+            labels (numpy.ndarray): Label assignments.
+            reweight_pow (float): The power of re-weighting. Defaults to 0.5.
+        """
+        histogram = np.bincount(
+            labels, minlength=self.num_classes).astype(np.float32)
+        inv_histogram = (1. / (histogram + 1e-10))**reweight_pow
+        weight = inv_histogram / inv_histogram.sum()
+        self.loss_weight.copy_(torch.from_numpy(weight))
+        self.head.criterion = nn.CrossEntropyLoss(weight=self.loss_weight)

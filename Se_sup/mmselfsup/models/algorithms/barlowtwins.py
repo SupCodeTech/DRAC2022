@@ -1,14 +1,13 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Dict, List, Tuple
+from typing import List, Optional
 
 import torch
 
-from mmselfsup.registry import MODELS
-from mmselfsup.structures import SelfSupDataSample
+from ..builder import ALGORITHMS, build_backbone, build_head, build_neck
 from .base import BaseModel
 
 
-@MODELS.register_module()
+@ALGORITHMS.register_module()
 class BarlowTwins(BaseModel):
     """BarlowTwins.
 
@@ -16,43 +15,60 @@ class BarlowTwins(BaseModel):
     Reduction <https://arxiv.org/abs/2103.03230>`_.
     Part of the code is borrowed from:
     `<https://github.com/facebookresearch/barlowtwins/blob/main/main.py>`_.
+
+    Args:
+        backbone (dict): Config dict for module of backbone. Defaults to None.
+        neck (dict): Config dict for module of deep features to compact
+            feature vectors. Defaults to None.
+        head (dict): Config dict for module of loss functions.
+            Defaults to None.
+        init_cfg (dict): Config dict for weight initialization.
+            Defaults to None.
     """
 
-    def extract_feat(self, inputs: List[torch.Tensor],
-                     **kwargs) -> Tuple[torch.Tensor]:
+    def __init__(self,
+                 backbone: dict = None,
+                 neck: dict = None,
+                 head: dict = None,
+                 init_cfg: Optional[dict] = None,
+                 **kwargs) -> None:
+        super(BarlowTwins, self).__init__(init_cfg)
+        assert backbone is not None
+        self.backbone = build_backbone(backbone)
+        assert neck is not None
+        self.neck = build_neck(neck)
+        assert head is not None
+        self.head = build_head(head)
+
+    def extract_feat(self, img: torch.Tensor) -> torch.Tensor:
         """Function to extract features from backbone.
 
         Args:
-            inputs (List[torch.Tensor]): The input images.
-            data_samples (List[SelfSupDataSample]): All elements required
-                during the forward function.
+            img (Tensor): Input images of shape (N, C, H, W).
+                Typically these should be mean centered and std scaled.
 
         Returns:
-            Tuple[torch.Tensor]: Backbone outputs.
+            tuple[Tensor]: backbone outputs.
         """
-        x = self.backbone(inputs[0])
+        x = self.backbone(img)
         return x
 
-    def loss(self, inputs: List[torch.Tensor],
-             data_samples: List[SelfSupDataSample],
-             **kwargs) -> Dict[str, torch.Tensor]:
-        """The forward function in training.
+    def forward_train(self, img: List[torch.Tensor]) -> dict:
+        """Forward computation during training.
 
         Args:
-            inputs (List[torch.Tensor]): The input images.
-            data_samples (List[SelfSupDataSample]): All elements required
-                during the forward function.
-
+            img (List[Tensor]): A list of input images with shape
+                (N, C, H, W). Typically these should be mean centered
+                and std scaled.
         Returns:
-            Dict[str, torch.Tensor]: A dictionary of loss components.
+            dict[str, Tensor]: A dictionary of loss components
         """
-        assert isinstance(inputs, list)
-        img_v1 = inputs[0]
-        img_v2 = inputs[1]
+        assert isinstance(img, list)
+        img_v1 = img[0]
+        img_v2 = img[1]
 
         z1 = self.neck(self.backbone(img_v1))[0]  # NxC
         z2 = self.neck(self.backbone(img_v2))[0]  # NxC
 
-        loss = self.head(z1, z2)
-        losses = dict(loss=loss)
-        return losses
+        losses = self.head(z1, z2)['loss']
+        return dict(loss=losses)

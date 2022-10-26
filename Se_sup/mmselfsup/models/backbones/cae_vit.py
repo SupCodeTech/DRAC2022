@@ -2,15 +2,15 @@
 import numpy as np
 import torch
 from mmcls.models import VisionTransformer
-from mmengine.model import ModuleList
-from mmengine.model.weight_init import trunc_normal_
+from mmcv.cnn.utils.weight_init import trunc_normal_
+from mmcv.runner.base_module import ModuleList
 from torch import nn
 
-from mmselfsup.registry import MODELS
+from ..builder import BACKBONES
 from ..utils import TransformerEncoderLayer, build_2d_sincos_position_embedding
 
 
-@MODELS.register_module()
+@BACKBONES.register_module()
 class CAEViT(VisionTransformer):
     """Vision Transformer for CAE pre-training.
 
@@ -97,8 +97,7 @@ class CAEViT(VisionTransformer):
             self.layers.append(TransformerEncoderLayer(**_layer_cfg))
 
     def init_weights(self) -> None:
-        """Initialize position embedding, patch embedding and cls token."""
-        super().init_weights()
+        super(CAEViT, self).init_weights()
         if not (isinstance(self.init_cfg, dict)
                 and self.init_cfg['type'] == 'Pretrained'):
             # initialize position  embedding in backbone
@@ -125,18 +124,6 @@ class CAEViT(VisionTransformer):
                 nn.init.constant_(m.bias, 0)
 
     def forward(self, img: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
-        """Generate features for masked images.
-
-        This function generates mask images and get the hidden features for
-        visible patches.
-
-        Args:
-            x (torch.Tensor): Input images, which is of shape B x C x H x W.
-            mask (torch.Tensor): Mask for input, which is of shape B x L.
-
-        Returns:
-            torch.Tensor: hidden features.
-        """
         x, _ = self.patch_embed(img)
         batch_size, _, dim = x.size()
 

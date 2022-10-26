@@ -1,55 +1,71 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Dict, List, Tuple
+import torch.nn as nn
 
-import torch
-
-from mmselfsup.registry import MODELS
-from mmselfsup.structures import SelfSupDataSample
+from ..builder import ALGORITHMS, build_backbone, build_head, build_neck
 from .base import BaseModel
 
 
-@MODELS.register_module()
+@ALGORITHMS.register_module()
 class SimSiam(BaseModel):
     """SimSiam.
 
     Implementation of `Exploring Simple Siamese Representation Learning
-    <https://arxiv.org/abs/2011.10566>`_. The operation of fixing learning rate
-    of predictor is in `engine/hooks/simsiam_hook.py`.
+    <https://arxiv.org/abs/2011.10566>`_.
+    The operation of fixing learning rate of predictor is in
+    `core/hooks/simsiam_hook.py`.
+
+    Args:
+        backbone (dict): Config dict for module of backbone.
+        neck (dict): Config dict for module of deep features to compact
+            feature vectors. Defaults to None.
+        head (dict): Config dict for module of loss functions.
+            Defaults to None.
     """
 
-    def extract_feat(self, inputs: List[torch.Tensor],
-                     **kwarg) -> Tuple[torch.Tensor]:
+    def __init__(self,
+                 backbone,
+                 neck=None,
+                 head=None,
+                 init_cfg=None,
+                 **kwargs):
+        super(SimSiam, self).__init__(init_cfg)
+        assert neck is not None
+        self.encoder = nn.Sequential(
+            build_backbone(backbone), build_neck(neck))
+        self.backbone = self.encoder[0]
+        self.neck = self.encoder[1]
+        assert head is not None
+        self.head = build_head(head)
+
+    def extract_feat(self, img):
         """Function to extract features from backbone.
 
         Args:
-            inputs (List[torch.Tensor]): The input images.
+            img (Tensor): Input images of shape (N, C, H, W).
+                Typically these should be mean centered and std scaled.
 
         Returns:
-            Tuple[torch.Tensor]: Backbone outputs.
+            tuple[Tensor]: backbone outputs.
         """
-        return self.backbone(inputs[0])
+        x = self.backbone(img)
+        return x
 
-    def loss(self, inputs: List[torch.Tensor],
-             data_samples: List[SelfSupDataSample],
-             **kwargs) -> Dict[str, torch.Tensor]:
-        """The forward function in training.
+    def forward_train(self, img):
+        """Forward computation during training.
 
         Args:
-            inputs (List[torch.Tensor]): The input images.
-            data_samples (List[SelfSupDataSample]): All elements required
-                during the forward function.
-
+            img (list[Tensor]): A list of input images with shape
+                (N, C, H, W). Typically these should be mean centered
+                and std scaled.
         Returns:
-            Dict[str, Tensor]: A dictionary of loss components.
+            loss[str, Tensor]: A dictionary of loss components
         """
-        img_v1 = inputs[0]
-        img_v2 = inputs[1]
+        assert isinstance(img, list)
+        img_v1 = img[0]
+        img_v2 = img[1]
 
-        z1 = self.neck(self.backbone(img_v1))[0]  # NxC
-        z2 = self.neck(self.backbone(img_v2))[0]  # NxC
+        z1 = self.encoder(img_v1)[0]  # NxC
+        z2 = self.encoder(img_v2)[0]  # NxC
 
-        loss_1 = self.head(z1, z2)
-        loss_2 = self.head(z2, z1)
-
-        losses = dict(loss=0.5 * (loss_1 + loss_2))
-        return losses
+        losses = 0.5 * (self.head(z1, z2)['loss'] + self.head(z2, z1)['loss'])
+        return dict(loss=losses)

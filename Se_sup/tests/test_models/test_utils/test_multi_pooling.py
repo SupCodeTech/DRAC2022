@@ -13,7 +13,7 @@ def test_multi_pooling():
         torch.rand((1, 64, 56, 56)),
         torch.rand((1, 128, 28, 28)),
     ]
-    res = layer(fake_in)
+    res = layer.forward(fake_in)
     assert res[0].shape == (1, 32, 12, 12)
     assert res[1].shape == (1, 64, 6, 6)
     assert res[2].shape == (1, 128, 4, 4)
@@ -25,7 +25,7 @@ def test_multi_pooling():
         torch.rand((1, 64, 56, 56)),
         torch.rand((1, 128, 28, 28)),
     ]
-    res = layer(fake_in)
+    res = layer.forward(fake_in)
     assert res[0].shape == (1, 32, 12, 12)
     assert res[1].shape == (1, 64, 6, 6)
     assert res[2].shape == (1, 128, 4, 4)

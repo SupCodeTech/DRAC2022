@@ -1,32 +1,29 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Dict, List, Optional, Tuple, Union
-
 import torch
 import torch.nn as nn
-from mmengine.model import ExponentialMovingAverage
-from mmengine.structures import BaseDataElement
+from mmcv.utils.logging import logger_initialized, print_log
 
-from mmselfsup.registry import MODELS
-from mmselfsup.structures import SelfSupDataSample
 from mmselfsup.utils import (batch_shuffle_ddp, batch_unshuffle_ddp,
                              concat_all_gather)
+from ..builder import ALGORITHMS, build_backbone, build_head, build_neck
 from .base import BaseModel
 
 
-@MODELS.register_module()
+@ALGORITHMS.register_module()
 class DenseCL(BaseModel):
     """DenseCL.
 
     Implementation of `Dense Contrastive Learning for Self-Supervised Visual
     Pre-Training <https://arxiv.org/abs/2011.09157>`_.
     Borrowed from the authors' code: `<https://github.com/WXinlong/DenseCL>`_.
-    The loss_lambda warmup is in `engine/hooks/densecl_hook.py`.
+    The loss_lambda warmup is in `core/hooks/densecl_hook.py`.
 
     Args:
         backbone (dict): Config dict for module of backbone.
         neck (dict): Config dict for module of deep features to compact
-            feature vectors.
-        head (dict): Config dict for module of head functions.
+            feature vectors. Defaults to None.
+        head (dict): Config dict for module of loss functions.
+            Defaults to None.
         queue_len (int): Number of negative keys maintained in the queue.
             Defaults to 65536.
         feat_dim (int): Dimension of compact feature vectors. Defaults to 128.
@@ -34,55 +31,71 @@ class DenseCL(BaseModel):
             encoder. Defaults to 0.999.
         loss_lambda (float): Loss weight for the single and dense contrastive
             loss. Defaults to 0.5.
-        pretrained (str, optional): The pretrained checkpoint path, support
-            local path and remote path. Defaults to None.
-        data_preprocessor (dict, optional): The config for preprocessing
-            input data. If None or no specified type, it will use
-            "SelfSupDataPreprocessor" as type.
-            See :class:`SelfSupDataPreprocessor` for more details.
-            Defaults to None.
-        init_cfg (Union[List[dict], dict], optional): Config dict for weight
-            initialization. Defaults to None.
     """
 
     def __init__(self,
-                 backbone: dict,
-                 neck: dict,
-                 head: dict,
-                 queue_len: int = 65536,
-                 feat_dim: int = 128,
-                 momentum: float = 0.999,
-                 loss_lambda: float = 0.5,
-                 pretrained: Optional[str] = None,
-                 data_preprocessor: Optional[dict] = None,
-                 init_cfg: Optional[Union[List[dict], dict]] = None) -> None:
-        super().__init__(
-            backbone=backbone,
-            neck=neck,
-            head=head,
-            pretrained=pretrained,
-            data_preprocessor=data_preprocessor,
-            init_cfg=init_cfg)
+                 backbone,
+                 neck=None,
+                 head=None,
+                 queue_len=65536,
+                 feat_dim=128,
+                 momentum=0.999,
+                 loss_lambda=0.5,
+                 init_cfg=None,
+                 **kwargs):
+        super(DenseCL, self).__init__(init_cfg)
+        assert neck is not None
+        self.encoder_q = nn.Sequential(
+            build_backbone(backbone), build_neck(neck))
+        self.encoder_k = nn.Sequential(
+            build_backbone(backbone), build_neck(neck))
 
-        # create momentum model
-        self.encoder_k = ExponentialMovingAverage(
-            nn.Sequential(self.backbone, self.neck), 1 - momentum)
+        self.backbone = self.encoder_q[0]
+        assert head is not None
+        self.head = build_head(head)
 
         self.queue_len = queue_len
+        self.momentum = momentum
         self.loss_lambda = loss_lambda
 
         # create the queue
         self.register_buffer('queue', torch.randn(feat_dim, queue_len))
         self.queue = nn.functional.normalize(self.queue, dim=0)
         self.register_buffer('queue_ptr', torch.zeros(1, dtype=torch.long))
-
         # create the second queue for dense output
         self.register_buffer('queue2', torch.randn(feat_dim, queue_len))
         self.queue2 = nn.functional.normalize(self.queue2, dim=0)
         self.register_buffer('queue2_ptr', torch.zeros(1, dtype=torch.long))
 
+    def init_weights(self):
+        """Init weights and copy query encoder init weights to key encoder."""
+        super().init_weights()
+
+        # Get the initialized logger, if not exist,
+        # create a logger named `mmselfsup`
+        logger_names = list(logger_initialized.keys())
+        logger_name = logger_names[0] if logger_names else 'mmselfsup'
+
+        # log that key encoder is initialized by the query encoder
+        print_log(
+            'Key encoder is initialized by the query encoder.',
+            logger=logger_name)
+
+        for param_q, param_k in zip(self.encoder_q.parameters(),
+                                    self.encoder_k.parameters()):
+            param_k.data.copy_(param_q.data)
+            param_k.requires_grad = False
+
     @torch.no_grad()
-    def _dequeue_and_enqueue(self, keys: torch.Tensor) -> None:
+    def _momentum_update_key_encoder(self):
+        """Momentum update of the key encoder."""
+        for param_q, param_k in zip(self.encoder_q.parameters(),
+                                    self.encoder_k.parameters()):
+            param_k.data = param_k.data * self.momentum + \
+                           param_q.data * (1. - self.momentum)
+
+    @torch.no_grad()
+    def _dequeue_and_enqueue(self, keys):
         """Update queue."""
         # gather keys before updating queue
         keys = concat_all_gather(keys)
@@ -99,7 +112,7 @@ class DenseCL(BaseModel):
         self.queue_ptr[0] = ptr
 
     @torch.no_grad()
-    def _dequeue_and_enqueue2(self, keys: torch.Tensor) -> None:
+    def _dequeue_and_enqueue2(self, keys):
         """Update queue2."""
         # gather keys before updating queue
         keys = concat_all_gather(keys)
@@ -115,40 +128,36 @@ class DenseCL(BaseModel):
 
         self.queue2_ptr[0] = ptr
 
-    def extract_feat(self, inputs: List[torch.Tensor],
-                     **kwargs) -> Tuple[torch.Tensor]:
+    def extract_feat(self, img):
         """Function to extract features from backbone.
 
         Args:
-            inputs (List[torch.Tensor]): The input images.
-            data_samples (List[SelfSupDataSample]): All elements required
-                during the forward function.
+            img (Tensor): Input images of shape (N, C, H, W).
+                Typically these should be mean centered and std scaled.
 
         Returns:
-            Tuple[torch.Tensor]: Backbone outputs.
+            tuple[Tensor]: backbone outputs.
         """
-        x = self.backbone(inputs[0])
+        x = self.backbone(img)
         return x
 
-    def loss(self, inputs: List[torch.Tensor],
-             data_samples: List[SelfSupDataSample],
-             **kwargs) -> Dict[str, torch.Tensor]:
-        """The forward function in training.
+    def forward_train(self, img, **kwargs):
+        """Forward computation during training.
 
         Args:
-            inputs (List[torch.Tensor]): The input images.
-            data_samples (List[SelfSupDataSample]): All elements required
-                during the forward function.
+            img (list[Tensor]): A list of input images with shape
+                (N, C, H, W). Typically these should be mean centered
+                and std scaled.
 
         Returns:
-            Dict[str, torch.Tensor]: A dictionary of loss components.
+            dict[str, Tensor]: A dictionary of loss components.
         """
-        assert isinstance(inputs, list)
-        im_q = inputs[0]
-        im_k = inputs[1]
+        assert isinstance(img, list)
+        im_q = img[0]
+        im_k = img[1]
         # compute query features
-        q_b = self.backbone(im_q)  # backbone features
-        q, q_grid, q2 = self.neck(q_b)  # queries: NxC; NxCxS^2
+        q_b = self.encoder_q[0](im_q)  # backbone features
+        q, q_grid, q2 = self.encoder_q[1](q_b)  # queries: NxC; NxCxS^2
         q_b = q_b[0]
         q_b = q_b.view(q_b.size(0), q_b.size(1), -1)
 
@@ -160,14 +169,13 @@ class DenseCL(BaseModel):
         # compute key features
         with torch.no_grad():  # no gradient to keys
             # update the key encoder
-            self.encoder_k.update_parameters(
-                nn.Sequential(self.backbone, self.neck))
+            self._momentum_update_key_encoder()
 
             # shuffle for making use of BN
             im_k, idx_unshuffle = batch_shuffle_ddp(im_k)
 
-            k_b = self.encoder_k.module[0](im_k)  # backbone features
-            k, k_grid, k2 = self.encoder_k.module[1](k_b)  # keys: NxC; NxCxS^2
+            k_b = self.encoder_k[0](im_k)  # backbone features
+            k, k_grid, k2 = self.encoder_k[1](k_b)  # keys: NxC; NxCxS^2
             k_b = k_b[0]
             k_b = k_b.view(k_b.size(0), k_b.size(1), -1)
 
@@ -207,8 +215,8 @@ class DenseCL(BaseModel):
         l_neg_dense = torch.einsum(
             'nc,ck->nk', [q_grid, self.queue2.clone().detach()])
 
-        loss_single = self.head(l_pos, l_neg)
-        loss_dense = self.head(l_pos_dense, l_neg_dense)
+        loss_single = self.head(l_pos, l_neg)['loss']
+        loss_dense = self.head(l_pos_dense, l_neg_dense)['loss']
 
         losses = dict()
         losses['loss_single'] = loss_single * (1 - self.loss_lambda)
@@ -219,26 +227,21 @@ class DenseCL(BaseModel):
 
         return losses
 
-    def predict(self, inputs: List[torch.Tensor],
-                data_samples: List[SelfSupDataSample],
-                **kwargs) -> SelfSupDataSample:
-        """Predict results from the extracted features.
+    def forward_test(self, img, **kwargs):
+        """Forward computation during test.
 
         Args:
-            batch_inputs (List[torch.Tensor]): The input images.
-            data_samples (List[SelfSupDataSample]): All elements required
-                during the forward function.
+            img (Tensor): Input of two concatenated images of shape
+                (N, 2, C, H, W). Typically these should be mean centered
+                and std scaled.
 
         Returns:
-            SelfSupDataSample: The prediction from model.
+            dict(Tensor): A dictionary of normalized output features.
         """
-        q_grid = self.extract_feat(inputs)[0]
+        im_q = img.contiguous()
+        # compute query features
+        # _, q_grid, _ = self.encoder_q(im_q)
+        q_grid = self.extract_feat(im_q)[0]
         q_grid = q_grid.view(q_grid.size(0), q_grid.size(1), -1)
         q_grid = nn.functional.normalize(q_grid, dim=1)
-
-        test_results = SelfSupDataSample()
-        q_grid = dict(value=q_grid)
-        q_grid = BaseDataElement(**q_grid)
-        test_results.q_grid = q_grid
-
-        return test_results
+        return None, q_grid, None

@@ -1,23 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Optional
-
 import numpy as np
 import torch
 import torch.distributed as dist
-from mmengine.dist import all_gather
 
 
-def gather_tensors(input_array: np.ndarray) -> np.ndarray:
-    """Gather tensor from all GPUs.
-
-    Args:
-        inpyt_array (np.ndarray): Extracted features.
-
-    Returns:
-        np.ndarray: Gatherd features.
-    """
+def gather_tensors(input_array):
+    """Gather tensor from all GPUs."""
     world_size = dist.get_world_size()
-
     # gather shapes first
     myshape = input_array.shape
     mycount = input_array.size
@@ -26,13 +15,11 @@ def gather_tensors(input_array: np.ndarray) -> np.ndarray:
         torch.Tensor(np.array(myshape)).cuda() for i in range(world_size)
     ]
     dist.all_gather(all_shape, shape_tensor)
-
     # compute largest shapes
     all_shape = [x.cpu().numpy() for x in all_shape]
     all_count = [int(x.prod()) for x in all_shape]
     all_shape = [list(map(int, x)) for x in all_shape]
     max_count = max(all_count)
-
     # padding tensors and gather them
     output_tensors = [
         torch.Tensor(max_count).cuda() for i in range(world_size)
@@ -41,7 +28,6 @@ def gather_tensors(input_array: np.ndarray) -> np.ndarray:
     padded_input_array[:mycount] = input_array.reshape(-1)
     input_tensor = torch.Tensor(padded_input_array).cuda()
     dist.all_gather(output_tensors, input_tensor)
-
     # unpadding gathered tensors
     padded_output = [x.cpu().numpy() for x in output_tensors]
     output = [
@@ -51,21 +37,8 @@ def gather_tensors(input_array: np.ndarray) -> np.ndarray:
     return output
 
 
-def gather_tensors_batch(input_array: np.ndarray,
-                         part_size: Optional[int] = 100,
-                         ret_rank: Optional[int] = -1) -> List[np.ndarray]:
-    """Batch-wise gathering to avoid CUDA out of memory.
-
-    Args:
-        input_array (np.ndarray): Extracted features.
-        part_size (int, optional): The defined part size to separate batch.
-            Defaults to 100.
-        ret_rank (int, optional): The process that returns. Other processes
-            will return None. Defaults to -1.
-
-    Returns:
-        np.ndarray: Gatherd features.
-    """
+def gather_tensors_batch(input_array, part_size=100, ret_rank=-1):
+    """batch-wise gathering to avoid CUDA out of memory."""
     rank = dist.get_rank()
     all_features = []
     part_num = input_array.shape[0] // part_size + 1 if input_array.shape[
@@ -97,16 +70,15 @@ def gather_tensors_batch(input_array: np.ndarray,
 
 
 @torch.no_grad()
-def concat_all_gather(tensor: torch.Tensor) -> torch.Tensor:
+def concat_all_gather(tensor):
     """Performs all_gather operation on the provided tensors.
 
-    Args:
-        tensor (torch.Tensor): Tensor to be broadcast from current process.
-
-    Returns:
-        torch.Tensor: The concatnated tensor.
+    *** Warning ***: torch.distributed.all_gather has no gradient.
     """
-    tensors_gather = all_gather(tensor)
+    tensors_gather = [
+        torch.ones_like(tensor) for _ in range(dist.get_world_size())
+    ]
+    dist.all_gather(tensors_gather, tensor, async_op=False)
 
     output = torch.cat(tensors_gather, dim=0)
     return output

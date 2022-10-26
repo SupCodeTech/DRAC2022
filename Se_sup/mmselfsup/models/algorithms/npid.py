@@ -1,15 +1,13 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Dict, List, Optional, Tuple, Union
-
 import torch
 import torch.nn as nn
 
-from mmselfsup.registry import MODELS
-from mmselfsup.structures import SelfSupDataSample
+from ..builder import (ALGORITHMS, build_backbone, build_head, build_memory,
+                       build_neck)
 from .base import BaseModel
 
 
-@MODELS.register_module()
+@ALGORITHMS.register_module()
 class NPID(BaseModel):
     """NPID.
 
@@ -18,79 +16,65 @@ class NPID(BaseModel):
 
     Args:
         backbone (dict): Config dict for module of backbone.
-        neck (dict): Config dict for module of deep features to
-            compact feature vectors.
-        head (dict): Config dict for module of head functions.
-        memory_bank (dict): Config dict for module of memory bank.
+        neck (dict): Config dict for module of deep features to compact feature
+            vectors. Defaults to None.
+        head (dict): Config dict for module of loss functions.
+            Defaults to None.
+        memory_bank (dict): Config dict for module of memory banks.
+            Defaults to None.
         neg_num (int): Number of negative samples for each image.
             Defaults to 65536.
         ensure_neg (bool): If False, there is a small probability
             that negative samples contain positive ones. Defaults to False.
-        pretrained (str, optional): The pretrained checkpoint path, support
-            local path and remote path. Defaults to None.
-        data_preprocessor (dict, optional): The config for preprocessing
-            input data. If None or no specified type, it will use
-            "SelfSupDataPreprocessor" as type.
-            See :class:`SelfSupDataPreprocessor` for more details.
-            Defaults to None.
-        init_cfg (Union[List[dict], dict], optional): Config dict for weight
-            initialization. Defaults to None.
     """
 
     def __init__(self,
-                 backbone: dict,
-                 neck: dict,
-                 head: dict,
-                 memory_bank: dict,
-                 neg_num: int = 65536,
-                 ensure_neg: bool = False,
-                 pretrained: Optional[str] = None,
-                 data_preprocessor: Optional[dict] = None,
-                 init_cfg: Optional[Union[List[dict], dict]] = None) -> None:
-        super().__init__(
-            backbone=backbone,
-            neck=neck,
-            head=head,
-            pretrained=pretrained,
-            data_preprocessor=data_preprocessor,
-            init_cfg=init_cfg)
+                 backbone,
+                 neck=None,
+                 head=None,
+                 memory_bank=None,
+                 neg_num=65536,
+                 ensure_neg=False,
+                 init_cfg=None):
+        super(NPID, self).__init__(init_cfg)
+        self.backbone = build_backbone(backbone)
+        if neck is not None:
+            self.neck = build_neck(neck)
+        assert head is not None
+        self.head = build_head(head)
         assert memory_bank is not None
-        self.memory_bank = MODELS.build(memory_bank)
+        self.memory_bank = build_memory(memory_bank)
 
         self.neg_num = neg_num
         self.ensure_neg = ensure_neg
 
-    def extract_feat(self, inputs: List[torch.Tensor],
-                     **kwarg) -> Tuple[torch.Tensor]:
+    def extract_feat(self, img):
         """Function to extract features from backbone.
 
         Args:
-            inputs (List[torch.Tensor]): The input images.
-            data_samples (List[SelfSupDataSample]): All elements required
-                during the forward function.
+            img (Tensor): Input images of shape (N, C, H, W).
+                Typically these should be mean centered and std scaled.
 
         Returns:
-            Tuple[torch.Tensor]: Backbone outputs.
+            tuple[Tensor]: backbone outputs.
         """
-        x = self.backbone(inputs[0])
+        x = self.backbone(img)
         return x
 
-    def loss(self, inputs: List[torch.Tensor],
-             data_samples: List[SelfSupDataSample],
-             **kwargs) -> Dict[str, torch.Tensor]:
-        """The forward function in training.
+    def forward_train(self, img, idx, **kwargs):
+        """Forward computation during training.
 
         Args:
-            inputs (List[torch.Tensor]): The input images.
-            data_samples (List[SelfSupDataSample]): All elements required
-                during the forward function.
+            img (Tensor): Input images of shape (N, C, H, W).
+                Typically these should be mean centered and std scaled.
+            idx (Tensor): Index corresponding to each image.
+            kwargs: Any keyword arguments to be used to forward.
 
         Returns:
-            Dict[str, Tensor]: A dictionary of loss components.
+            dict[str, Tensor]: A dictionary of loss components.
         """
-        feature = self.backbone(inputs[0])
-        idx = [data_sample.sample_idx.value for data_sample in data_samples]
-        idx = torch.cat(idx)
+        feature = self.extract_feat(img)
+        idx = idx.cuda()
         if self.with_neck:
             feature = self.neck(feature)[0]
         feature = nn.functional.normalize(feature)  # BxC
@@ -117,8 +101,8 @@ class NPID(BaseModel):
                                   [pos_feat, feature]).unsqueeze(-1)
         neg_logits = torch.bmm(neg_feat, feature.unsqueeze(2)).squeeze(2)
 
-        loss = self.head(pos_logits, neg_logits)
-        losses = dict(loss=loss)
+        losses = self.head(pos_logits, neg_logits)
+
         # update memory bank
         with torch.no_grad():
             self.memory_bank.update(idx, feature.detach())

@@ -1,17 +1,18 @@
 # 基础教程
 
-- [基础教程](#%E5%9F%BA%E7%A1%80%E6%95%99%E7%A8%8B)
-  - [训练已有的算法](#%E8%AE%AD%E7%BB%83%E5%B7%B2%E6%9C%89%E7%9A%84%E7%AE%97%E6%B3%95)
-    - [使用 CPU 训练](#%E4%BD%BF%E7%94%A8-cpu-%E8%AE%AD%E7%BB%83)
-    - [使用 单张/多张 显卡训练](#%E4%BD%BF%E7%94%A8-%E5%8D%95%E5%BC%A0%E5%A4%9A%E5%BC%A0-%E6%98%BE%E5%8D%A1%E8%AE%AD%E7%BB%83)
-    - [使用多台机器训练](#%E4%BD%BF%E7%94%A8%E5%A4%9A%E5%8F%B0%E6%9C%BA%E5%99%A8%E8%AE%AD%E7%BB%83)
-    - [在一台机器上启动多个任务](#%E5%9C%A8%E4%B8%80%E5%8F%B0%E6%9C%BA%E5%99%A8%E4%B8%8A%E5%90%AF%E5%8A%A8%E5%A4%9A%E4%B8%AA%E4%BB%BB%E5%8A%A1)
-  - [基准测试](#%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95)
-  - [工具和建议](#%E5%B7%A5%E5%85%B7%E5%92%8C%E5%BB%BA%E8%AE%AE)
-    - [统计模型的参数](#%E7%BB%9F%E8%AE%A1%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%8F%82%E6%95%B0)
-    - [发布模型](#%E5%8F%91%E5%B8%83%E6%A8%A1%E5%9E%8B)
-    - [使用 t-SNE 来做模型可视化](#%E4%BD%BF%E7%94%A8-t-sne-%E6%9D%A5%E5%81%9A%E6%A8%A1%E5%9E%8B%E5%8F%AF%E8%A7%86%E5%8C%96)
-    - [可复现性](#%E5%8F%AF%E5%A4%8D%E7%8E%B0%E6%80%A7)
+- [基础教程](#基础教程)
+  - [训练已有的算法](#训练已有的算法)
+    - [使用 CPU 训练](#使用-cpu-训练)
+    - [使用 单张/多张 显卡训练](#使用-单张多张-显卡训练)
+    - [使用多台机器训练](#使用多台机器训练)
+    - [在一台机器上启动多个任务](#在一台机器上启动多个任务)
+  - [基准测试](#基准测试)
+  - [工具和建议](#工具和建议)
+    - [统计模型的参数](#统计模型的参数)
+    - [发布模型](#发布模型)
+    - [使用 t-SNE 来做模型可视化](#使用-t-sne-来做模型可视化)
+    - [MAE 可视化](#mae-可视化)
+    - [可复现性](#可复现性)
 
 本文档提供 MMSelfSup 相关用法的基础教程。 如果您对如何安装 MMSelfSup 以及其相关依赖库有疑问, 请参考 [安装文档](install.md).
 
@@ -31,7 +32,7 @@ python tools/train.py ${CONFIG_FILE}
 ### 使用 单张/多张 显卡训练
 
 ```shell
-sh tools/dist_train.sh ${CONFIG_FILE} ${GPUS} --work-dir ${YOUR_WORK_DIR} [optional arguments]
+bash tools/dist_train.sh ${CONFIG_FILE} ${GPUS} --work-dir ${YOUR_WORK_DIR} [optional arguments]
 ```
 
 可选参数:
@@ -43,7 +44,7 @@ sh tools/dist_train.sh ${CONFIG_FILE} ${GPUS} --work-dir ${YOUR_WORK_DIR} [optio
 
 ```shell
 # checkpoints and logs saved in WORK_DIR=work_dirs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k/
-sh tools/dist_train.sh configs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k.py 8 --work_dir work_dirs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k/
+bash tools/dist_train.sh configs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k.py 8 --work_dir work_dirs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k/
 ```
 
 **注意**: 在训练过程中, checkpoints 和 logs 被保存在同一目录层级下.
@@ -51,13 +52,13 @@ sh tools/dist_train.sh configs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k.p
 此外, 如果您在一个被 [slurm](https://slurm.schedmd.com/) 管理的集群中训练， 您可以使用以下的脚本开展训练:
 
 ```shell
-GPUS_PER_NODE=${GPUS_PER_NODE} GPUS=${GPUS} SRUN_ARGS=${SRUN_ARGS} sh tools/slurm_train.sh ${PARTITION} ${JOB_NAME} ${CONFIG_FILE} ${YOUR_WORK_DIR} [optional arguments]
+GPUS_PER_NODE=${GPUS_PER_NODE} GPUS=${GPUS} SRUN_ARGS=${SRUN_ARGS} bash tools/slurm_train.sh ${PARTITION} ${JOB_NAME} ${CONFIG_FILE} ${YOUR_WORK_DIR} [optional arguments]
 ```
 
 例如:
 
 ```shell
-GPUS_PER_NODE=8 GPUS=8 sh tools/slurm_train.sh Dummy Test_job configs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k.py work_dirs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k/
+GPUS_PER_NODE=8 GPUS=8 bash tools/slurm_train.sh Dummy Test_job configs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k.py work_dirs/selfsup/odc/odc_resnet50_8xb64-steplr-440e_in1k/
 ```
 
 ### 使用多台机器训练
@@ -67,13 +68,13 @@ GPUS_PER_NODE=8 GPUS=8 sh tools/slurm_train.sh Dummy Test_job configs/selfsup/od
 在第一台机器上:
 
 ```shell
-NNODES=2 NODE_RANK=0 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR sh tools/dist_train.sh $CONFIG $GPUS
+NNODES=2 NODE_RANK=0 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR bash tools/dist_train.sh $CONFIG $GPUS
 ```
 
 在第二台机器上:
 
 ```shell
-NNODES=2 NODE_RANK=1 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR sh tools/dist_train.sh $CONFIG $GPUS
+NNODES=2 NODE_RANK=1 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR bash tools/dist_train.sh $CONFIG $GPUS
 ```
 
 但是，如果您不使用高速网路连接这几台机器的话，训练将会非常慢。
@@ -87,8 +88,8 @@ NNODES=2 NODE_RANK=1 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR sh tools/dist_tr
 如果您使用  `dist_train.sh`  来启动训练任务:
 
 ```shell
-CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29500 sh tools/dist_train.sh ${CONFIG_FILE} 4 --work-dir tmp_work_dir_1
-CUDA_VISIBLE_DEVICES=4,5,6,7 PORT=29501 sh tools/dist_train.sh ${CONFIG_FILE} 4 --work-dir tmp_work_dir_2
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29500 bash tools/dist_train.sh ${CONFIG_FILE} 4 --work-dir tmp_work_dir_1
+CUDA_VISIBLE_DEVICES=4,5,6,7 PORT=29501 bash tools/dist_train.sh ${CONFIG_FILE} 4 --work-dir tmp_work_dir_2
 ```
 
 如果您使用 slurm 来启动训练任务，你有两种方式来为每个任务设置不同的端口:
@@ -110,8 +111,8 @@ dist_params = dict(backend='nccl', port=29501)
 然后您可以通过 config1.py 和 config2.py 来启动两个不同的任务.
 
 ```shell
-CUDA_VISIBLE_DEVICES=0,1,2,3 GPUS=4 sh tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config1.py tmp_work_dir_1
-CUDA_VISIBLE_DEVICES=4,5,6,7 GPUS=4 sh tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config2.py tmp_work_dir_2
+CUDA_VISIBLE_DEVICES=0,1,2,3 GPUS=4 bash tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config1.py tmp_work_dir_1
+CUDA_VISIBLE_DEVICES=4,5,6,7 GPUS=4 bash tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config2.py tmp_work_dir_2
 ```
 
 方法 2:
@@ -119,8 +120,8 @@ CUDA_VISIBLE_DEVICES=4,5,6,7 GPUS=4 sh tools/slurm_train.sh ${PARTITION} ${JOB_N
 除了修改配置文件之外, 您可以设置 `cfg-options` 来重写默认的端口号:
 
 ```shell
-CUDA_VISIBLE_DEVICES=0,1,2,3 GPUS=4 sh tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config1.py tmp_work_dir_1 --cfg-options dist_params.port=29500
-CUDA_VISIBLE_DEVICES=4,5,6,7 GPUS=4 sh tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config2.py tmp_work_dir_2 --cfg-options dist_params.port=29501
+CUDA_VISIBLE_DEVICES=0,1,2,3 GPUS=4 bash tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config1.py tmp_work_dir_1 --cfg-options dist_params.port=29500
+CUDA_VISIBLE_DEVICES=4,5,6,7 GPUS=4 bash tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config2.py tmp_work_dir_2 --cfg-options dist_params.port=29501
 ```
 
 ## 基准测试
@@ -163,6 +164,28 @@ python tools/analysis_tools/visualize_tsne.py ${CONFIG_FILE} --checkpoint ${CKPT
 - `CKPT_PATH`: 预训练模型的路径.
 - `WORK_DIR`: 保存可视化结果的路径.
 - `[optional arguments]`: 可选参数，具体可以参考 [visualize_tsne.py](../../tools/analysis_tools/visualize_tsne.py)
+
+### MAE 可视化
+
+我们提供了一个对 MAE 掩码效果和重建效果可视化可视化的方法:
+
+```shell
+python tools/misc/mae_visualization.py ${IMG_PATH} ${CONFIG_FILE} ${CKPT_PATH} ${OUT_FILE} --device ${DEVICE}
+```
+
+参数:
+
+- `IMG_PATH`: 用于可视化的图片
+- `CONFIG_FILE`: 训练预训练模型的参数配置文件.
+- `CKPT_PATH`: 预训练模型的路径.
+- `OUT_FILE`: 用于保存可视化结果的图片路径
+- `DEVICE`: 用于推理的设备.
+
+示例:
+
+```shell
+python tools/misc/mae_visualization.py tests/data/color.jpg configs/selfsup/mae/mae_vit-base-p16_8xb512-coslr-400e_in1k.py mae_epoch_400.pth results.jpg --device 'cuda:0'
+```
 
 ### 可复现性
 

@@ -3,8 +3,8 @@
 
 # This file is modified from
 # https://github.com/facebookresearch/deepcluster/blob/master/clustering.py
+
 import time
-from typing import Any, List, Optional, Tuple
 
 try:
     import faiss
@@ -17,16 +17,14 @@ from scipy.sparse import csr_matrix
 __all__ = ['Kmeans', 'PIC']
 
 
-def preprocess_features(npdata, pca: np.ndarray) -> np.ndarray:
+def preprocess_features(npdata, pca):
     """Preprocess an array of features.
 
     Args:
-        npdata (np.ndarray): Features to preprocess.
-        pca (int): Dim of output.
-
+        npdata (np.array N * ndim): features to preprocess
+        pca (int): dim of output
     Returns:
-        np.ndarray: Data PCA-reduced, whitened and L2-normalized, with dim
-            N * pca.
+        np.array of dim N * pca: data PCA-reduced, whitened and L2-normalized
     """
     _, ndim = npdata.shape
     assert npdata.dtype == np.float32
@@ -54,17 +52,15 @@ def preprocess_features(npdata, pca: np.ndarray) -> np.ndarray:
     return npdata
 
 
-def make_graph(xb: np.ndarray, nnn: int) -> Tuple[List, List]:
+def make_graph(xb, nnn):
     """Builds a graph of nearest neighbors.
 
     Args:
-        xb (np.ndarray): Input data.
-        nnn (int): Number of nearest neighbors.
-
+        xb (np.array): data
+        nnn (int): number of nearest neighbors
     Returns:
-        Tuple[List, List]:
-            - I: for each data the list of distances to its nnn NN.
-            - D: for each data the list of ids to its nnn nearest neighbors.
+        list: for each data the list of ids to its nnn nearest neighbors
+        list: for each data the list of distances to its nnn NN
     """
     N, dim = xb.shape
 
@@ -80,20 +76,14 @@ def make_graph(xb: np.ndarray, nnn: int) -> Tuple[List, List]:
     return I, D
 
 
-def run_kmeans(x: np.ndarray,
-               nmb_clusters: int,
-               verbose: Optional[bool] = False) -> Tuple[List, float]:
+def run_kmeans(x, nmb_clusters, verbose=False):
     """Runs kmeans on 1 GPU.
 
     Args:
-        x (np.ndarray): Data.
-        nmb_clusters (int): Number of clusters.
-        verbose (bool, optional): Whether to print information.
-
+        x: data
+        nmb_clusters (int): number of clusters
     Returns:
-        Tuple[List, float]:
-            - List: ids of data in each cluster.
-            - losses: loss of clustering.
+        list: ids of data in each cluster
     """
     n_data, d = x.shape
 
@@ -116,9 +106,7 @@ def run_kmeans(x: np.ndarray,
     # perform the training
     clus.train(x, index)
     _, I = index.search(x, 1)  # noqa E741
-
-    stats = clus.iteration_stats
-    losses = np.array([stats.at(i).obj for i in range(stats.size())])
+    losses = faiss.vector_to_array(clus.obj)
     if verbose:
         print(f'k-means loss evolution: {losses}')
 
@@ -126,26 +114,15 @@ def run_kmeans(x: np.ndarray,
 
 
 class Kmeans:
-    """K-means algorithm process.
 
-    Args:
-        k (int): Number of clusters.
-        pca_dim: Dim of output.
-    """
-
-    def __init__(self, k: int, pca_dim: Optional[int] = 256) -> None:
+    def __init__(self, k, pca_dim=256):
         self.k = k
         self.pca_dim = pca_dim
 
-    def cluster(self, feat: np.ndarray, verbose=False) -> float:
+    def cluster(self, feat, verbose=False):
         """Performs k-means clustering.
-
-        Args:
-            feat (np.ndarray): data to cluster, with N * dim.
-            verbose (bool, optional): Whether to print information.
-
-        Returns:
-            float: Loss of clustering.
+            Args:
+                x_data (np.array N * dim): data to cluster
         """
         end = time.time()
 
@@ -161,19 +138,18 @@ class Kmeans:
         return loss
 
 
-def make_adjacencyW(ids: np.ndarray, distances: np.ndarray,
-                    sigma: float) -> csr_matrix:
+def make_adjacencyW(ids, distances, sigma):
     """Create adjacency matrix with a Gaussian kernel.
 
     Args:
-        ids (np.ndarray): For each vertex the ids to its nnn linked vertices
+        ids (numpy array): for each vertex the ids to its nnn linked vertices
             + first column of identity.
-        distances (np.ndarray): For each data the l2 distances to its nnn
+        distances (numpy array): for each data the l2 distances to its nnn
             linked vertices + first column of zeros.
         sigma (float): Bandwidth of the Gaussian kernel.
 
     Returns:
-        csr_matrix: Affinity matrix of the graph.
+        csr_matrix: affinity matrix of the graph.
     """
     V, k = ids.shape
     k = k - 1
@@ -190,21 +166,8 @@ def make_adjacencyW(ids: np.ndarray, distances: np.ndarray,
     return adj_matrix
 
 
-def run_pic(ids: np.ndarray, distances: np.ndarray, sigma: float,
-            alpha: float) -> List[int]:
-    """Run PIC algorithm.
-
-    Args:
-        ids (np.ndarray): For each vertex the ids to its nnn linked vertices
-            + first column of identity.
-        distances (np.ndarray): For each data the l2 distances to its nnn
-            linked vertices + first column of zeros.
-        sigma (float): Bandwidth of the Gaussian kernel.
-        alpha (float): Parameter in PIC.
-
-    Returns:
-        List[int]: Cluster information.
-    """
+def run_pic(ids, distances, sigma, alpha):
+    """Run PIC algorithm."""
     a = make_adjacencyW(ids, distances, sigma)
     graph = a + a.transpose()
     nim = graph.shape[0]
@@ -232,8 +195,7 @@ def run_pic(ids: np.ndarray, distances: np.ndarray, sigma: float,
     return [int(i) for i in clust]
 
 
-def find_maxima_cluster(W: np.ndarray, v: np.ndarray) -> np.ndarray:
-    """Find maxima cluster in PIC algorithm."""
+def find_maxima_cluster(W, v):
     n, m = W.shape
     assert (n == m)
     assign = np.zeros(n)
@@ -271,24 +233,25 @@ class PIC():
     neighbors.
 
     Args:
-        args (optional): For consistency with k-means init
-        sigma (float, optional): Bandwidth of the Gaussian kernel.
-            Defaults to 0.2.
-        nnn (int, optional): Number of nearest neighbors. Defaults to 5.
-        alpha (float, optional): Parameter in PIC. Defaults to 0.001.
-        distribute_singletons (bool, optional): If True, reassign each
-            singleton to the cluster of its closest non singleton nearest
-            neighbors (up to nnn nearest neighbors). Defaults to True.
-        pca_dim (int, optional): Dim of output. Defaults to 256.
+        args: for consistency with k-means init
+        sigma (float): bandwidth of the Gaussian kernel (default 0.2)
+        nnn (int): number of nearest neighbors (default 5)
+        alpha (float): parameter in PIC (default 0.001)
+        distribute_singletons (bool): If True, reassign each singleton to
+            the cluster of its closest non singleton nearest neighbors (up to
+            nnn nearest neighbors).
+    Attributes:
+        images_lists (list of list): for each cluster, the list of image
+            indexes belonging to this cluster
     """
 
     def __init__(self,
-                 args: Any = None,
-                 sigma: Optional[float] = 0.2,
-                 nnn: Optional[int] = 5,
-                 alpha: Optional[float] = 0.001,
-                 distribute_singletons: Optional[bool] = True,
-                 pca_dim: Optional[int] = 256) -> None:
+                 args=None,
+                 sigma=0.2,
+                 nnn=5,
+                 alpha=0.001,
+                 distribute_singletons=True,
+                 pca_dim=256):
         self.sigma = sigma
         self.alpha = alpha
         self.nnn = nnn
@@ -296,15 +259,6 @@ class PIC():
         self.pca_dim = pca_dim
 
     def cluster(self, data, verbose=False):
-        """Performs PIC clustering.
-
-        Args:
-            data (np.ndarray): data to cluster, with N * dim.
-            verbose (bool, optional): Whether to print information.
-
-        Returns:
-            int: 0.
-        """
         end = time.time()
 
         # preprocess the data

@@ -25,7 +25,7 @@ jobs:
           name: Check docstring coverage
           command: |
             pip install interrogate
-            interrogate -v --ignore-init-method --ignore-module --ignore-nested-functions --ignore-magic --ignore-regex "__repr__" --fail-under 90 mmselfsup
+            interrogate -v --ignore-init-method --ignore-module --ignore-nested-functions --ignore-magic --ignore-regex "__repr__" --fail-under 50 mmselfsup
   build_cpu:
     parameters:
       # The python version must match available image tags in
@@ -42,6 +42,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Get MMCV_TORCH as environment variables
+          command: |
+            . .circleci/scripts/get_mmcv_var.sh << parameters.torch >>
+            source $BASH_ENV
+      - run:
           name: Install Libraries
           command: |
             sudo apt-get update
@@ -49,30 +54,28 @@ jobs:
       - run:
           name: Configure Python & pip
           command: |
-            pip install --upgrade pip
-            pip install wheel
+            python -m pip install --upgrade pip
+            python -m pip install wheel
       - run:
           name: Install PyTorch
           command: |
             python -V
-            pip install torch==<< parameters.torch >>+cpu torchvision==<< parameters.torchvision >>+cpu -f https://download.pytorch.org/whl/torch_stable.html
+            python -m pip install torch==<< parameters.torch >>+cpu torchvision==<< parameters.torchvision >>+cpu -f https://download.pytorch.org/whl/torch_stable.html
       - run:
           name: Install mmselfsup dependencies
           command: |
-            pip install git+https://github.com/open-mmlab/mmengine.git@main
-            pip install -U openmim
-            mim install 'mmcv >= 2.0.0rc1'
-            pip install -r requirements/tests.txt
+            python -m pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cpu/torch${MMCV_TORCH}/index.html
+            python -m pip install -r requirements.txt
       - run:
           name: Build and install
           command: |
-            pip install -e .
+            python -m pip install -e .
       - run:
           name: Run unittests
           command: |
-            coverage run --branch --source mmselfsup -m pytest tests/
-            coverage xml
-            coverage report -m
+            python -m coverage run --branch --source mmselfsup -m pytest tests/
+            python -m coverage xml
+            python -m coverage report -m
   build_cuda:
     parameters:
       torch:
@@ -85,28 +88,25 @@ jobs:
         default: 7
     machine:
       image: ubuntu-2004-cuda-11.4:202110-01
-      # docker_layer_caching: true
+      docker_layer_caching: true
     resource_class: gpu.nvidia.small
     steps:
       - checkout
       - run:
-          # CLoning repos in VM since Docker doesn't have access to the private key
-          name: Clone Repos
+          name: Get MMCV_TORCH and MMCV_CUDA as environment variables
           command: |
-            git clone -b main --depth 1 https://github.com/open-mmlab/mmengine.git /home/circleci/mmengine
-            git clone -b dev-1.x --depth 1 https://github.com/open-mmlab/mmclassification.git /home/circleci/mmclassification
+            . .circleci/scripts/get_mmcv_var.sh << parameters.torch >> << parameters.cuda >>
+            source $BASH_ENV
       - run:
           name: Build Docker image
           command: |
             docker build .circleci/docker -t mmselfsup:gpu --build-arg PYTORCH=<< parameters.torch >> --build-arg CUDA=<< parameters.cuda >> --build-arg CUDNN=<< parameters.cudnn >>
-            docker run --gpus all -t -d -v /home/circleci/project:/mmselfsup -v /home/circleci/mmengine:/mmengine -v /home/circleci/mmclassification:/mmclassification -w /mmselfsup --name mmselfsup mmselfsup:gpu
+            docker run --gpus all -t -d -v /home/circleci/project:/mmselfsup -w /mmselfsup --name mmselfsup mmselfsup:gpu
       - run:
           name: Install mmselfsup dependencies
           command: |
-            docker exec mmselfsup pip install -e /mmengine
-            docker exec mmselfsup pip install -U openmim
-            docker exec mmselfsup mim install 'mmcv >= 2.0.0rc1'
-            docker exec mmselfsup pip install -r requirements/tests.txt
+            docker exec mmselfsup pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/${MMCV_CUDA}/torch${MMCV_TORCH}/index.html
+            docker exec mmselfsup pip install -r requirements.txt
       - run:
           name: Build and install
           command: |
@@ -114,8 +114,7 @@ jobs:
       - run:
           name: Run unittests
           command: |
-            docker exec mmselfsup pytest tests/
-
+            docker exec mmselfsup python -m pytest tests/
 workflows:
   pr_stage_lint:
     when: << pipeline.parameters.lint_only >>
@@ -125,8 +124,7 @@ workflows:
           filters:
             branches:
               ignore:
-                - dev-1.x
-                - 1.x
+                - master
   pr_stage_test:
     when:
       not:
@@ -137,7 +135,7 @@ workflows:
           filters:
             branches:
               ignore:
-                - dev-1.x
+                - master
       - build_cpu:
           name: minimum_version_cpu
           torch: 1.6.0
@@ -178,4 +176,4 @@ workflows:
           filters:
             branches:
               only:
-                - dev-1.x
+                - master

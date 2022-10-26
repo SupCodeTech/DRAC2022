@@ -4,14 +4,14 @@ from typing import Tuple
 import torch
 import torch.nn as nn
 from mmcv.cnn import build_norm_layer
-from mmengine.model import BaseModule
-from mmengine.model.weight_init import trunc_normal_
+from mmcv.cnn.utils.weight_init import trunc_normal_
+from mmcv.runner import BaseModule
 
-from mmselfsup.registry import MODELS
+from ..builder import NECKS
 from ..utils import CAETransformerRegressorLayer, TransformerEncoderLayer
 
 
-@MODELS.register_module()
+@NECKS.register_module()
 class CAENeck(BaseModule):
     """Neck for CAE Pre-training.
 
@@ -115,14 +115,12 @@ class CAENeck(BaseModule):
         self.mask_token = nn.Parameter(torch.zeros(1, 1, embed_dims))
 
     def init_weights(self) -> None:
-        """Initialization."""
-        super().init_weights()
+        super(CAENeck, self).init_weights()
         self.apply(self._init_weights)
         trunc_normal_(self.mask_token, std=0.02)
         trunc_normal_(self.head.weight, std=0.02)
 
     def _init_weights(self, m: nn.Module) -> None:
-        """Initialization."""
         if isinstance(m, nn.Linear):
             nn.init.xavier_uniform_(m.weight)
             if isinstance(m, nn.Linear) and m.bias is not None:

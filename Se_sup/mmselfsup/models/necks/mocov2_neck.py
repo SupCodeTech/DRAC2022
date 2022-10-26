@@ -1,14 +1,11 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Optional, Union
-
-import torch
 import torch.nn as nn
-from mmengine.model import BaseModule
+from mmcv.runner import BaseModule
 
-from mmselfsup.registry import MODELS
+from ..builder import NECKS
 
 
-@MODELS.register_module()
+@NECKS.register_module()
 class MoCoV2Neck(BaseModule):
     """The non-linear neck of MoCo v2: fc-relu-fc.
 
@@ -23,12 +20,12 @@ class MoCoV2Neck(BaseModule):
     """
 
     def __init__(self,
-                 in_channels: int,
-                 hid_channels: int,
-                 out_channels: int,
-                 with_avg_pool: bool = True,
-                 init_cfg: Optional[Union[dict, List[dict]]] = None) -> None:
-        super().__init__(init_cfg)
+                 in_channels,
+                 hid_channels,
+                 out_channels,
+                 with_avg_pool=True,
+                 init_cfg=None):
+        super(MoCoV2Neck, self).__init__(init_cfg)
         self.with_avg_pool = with_avg_pool
         if with_avg_pool:
             self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
@@ -36,15 +33,7 @@ class MoCoV2Neck(BaseModule):
             nn.Linear(in_channels, hid_channels), nn.ReLU(inplace=True),
             nn.Linear(hid_channels, out_channels))
 
-    def forward(self, x: List[torch.Tensor]) -> List[torch.Tensor]:
-        """Forward function.
-
-        Args:
-            x (List[torch.Tensor]): The feature map of backbone.
-
-        Returns:
-            List[torch.Tensor]: The output features.
-        """
+    def forward(self, x):
         assert len(x) == 1
         x = x[0]
         if self.with_avg_pool:

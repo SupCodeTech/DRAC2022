@@ -3,16 +3,12 @@ import platform
 
 import pytest
 import torch
-from mmengine.structures import InstanceData
 
 from mmselfsup.models.algorithms import CAE
-from mmselfsup.structures import SelfSupDataSample
-from mmselfsup.utils import register_all_modules
-
-register_all_modules()
 
 # model settings
-backbone = dict(type='CAEViT', arch='b', patch_size=16, init_values=0.1)
+backbone = dict(
+    type='CAEViT', arch='b', patch_size=16, init_values=0.1, qkv_bias=False)
 neck = dict(
     type='CAENeck',
     patch_size=16,
@@ -24,40 +20,29 @@ neck = dict(
     init_values=0.1,
 )
 head = dict(
-    type='CAEHead',
-    tokenizer_path='cae_ckpt/encoder_stat_dict.pth',
-    loss=dict(type='CAELoss', lambd=2))
-
-data_preprocessor = dict(
-    type='mmselfsup.CAEDataPreprocessor',
-    mean=[124, 117, 104],
-    std=[59, 58, 58],
-    bgr_to_rgb=True)
+    type='CAEHead', tokenizer_path='cae_ckpt/encoder_stat_dict.pth', lambd=2)
 
 
 @pytest.mark.skipif(platform.system() == 'Windows', reason='Windows mem limit')
 def test_cae():
-    model = CAE(
-        backbone=backbone,
-        neck=neck,
-        head=head,
-        data_preprocessor=data_preprocessor)
-    # model.init_weights()
+    with pytest.raises(AssertionError):
+        model = CAE(backbone=None, neck=neck, head=head)
+    with pytest.raises(AssertionError):
+        model = CAE(backbone=backbone, neck=None, head=head)
+    with pytest.raises(AssertionError):
+        model = CAE(backbone=backbone, neck=neck, head=None)
 
-    fake_img = torch.rand((1, 3, 224, 224))
-    fake_target_img = torch.rand((1, 3, 112, 112))
-    fake_mask = torch.zeros((196)).bool()
-    fake_mask[75:150] = 1
-    fake_data_sample = SelfSupDataSample()
-    fake_mask = InstanceData(value=fake_mask)
-    fake_data_sample.mask = fake_mask
-    fake_data_sample = [fake_data_sample]
+    model = CAE(backbone=backbone, neck=neck, head=head)
+    model.init_weights()
 
-    fake_data = {
-        'inputs': [fake_img, fake_target_img],
-        'data_sample': fake_data_sample
-    }
+    fake_input = torch.rand((1, 3, 224, 224))
+    fake_target = torch.rand((1, 3, 112, 112))
+    fake_mask = torch.zeros((1, 196)).bool()
+    fake_mask[:, 75:150] = 1
 
-    fake_batch_inputs, fake_data_samples = model.data_preprocessor(fake_data)
-    fake_outputs = model(fake_batch_inputs, fake_data_samples, mode='loss')
-    assert isinstance(fake_outputs['loss'].item(), float)
+    inputs = (fake_input, fake_target, fake_mask)
+
+    fake_loss = model.forward_train(inputs)
+    fake_feat = model.extract_feat(fake_input, fake_mask)
+    assert isinstance(fake_loss['loss'].item(), float)
+    assert list(fake_feat.shape) == [1, 122, 768]

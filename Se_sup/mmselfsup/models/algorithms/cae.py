@@ -1,14 +1,14 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Dict, List, Optional, Union
+from typing import Sequence
 
 import torch
+from torchvision.transforms import Normalize
 
-from mmselfsup.registry import MODELS
-from mmselfsup.structures import SelfSupDataSample
+from ..builder import ALGORITHMS, build_backbone, build_head, build_neck
 from .base import BaseModel
 
 
-@MODELS.register_module()
+@ALGORITHMS.register_module()
 class CAE(BaseModel):
     """CAE.
 
@@ -16,44 +16,44 @@ class CAE(BaseModel):
     Learning <https://arxiv.org/abs/2202.03026>`_.
 
     Args:
-        backbone (dict): Config dict for module of backbone.
-        neck (dict): Config dict for module of neck.
-        head (dict): Config dict for module of head functions.
+        backbone (dict, optional): Config dict for module of backbone.
+        neck (dict, optional): Config dict for module of deep features to
+            compact feature vectors. Defaults to None.
+        head (dict, optional): Config dict for module of loss functions.
+            Defaults to None.
         base_momentum (float): The base momentum coefficient for the target
             network. Defaults to 0.0.
-        data_preprocessor (dict, optional): The config for preprocessing
-            input data. If None or no specified type, it will use
-            "SelfSupDataPreprocessor" as type.
-            See :class:`SelfSupDataPreprocessor` for more details.
-            Defaults to None.
-        init_cfg (Union[List[dict], dict], optional): Config dict for weight
-            initialization. Defaults to None.
+        init_cfg (dict, optional): the config to control the initialization.
     """
 
     def __init__(self,
-                 backbone: dict,
-                 neck: dict,
-                 head: dict,
+                 backbone: dict = None,
+                 neck: dict = None,
+                 head: dict = None,
                  base_momentum: float = 0.0,
-                 data_preprocessor: Optional[dict] = None,
-                 init_cfg: Optional[Union[List[dict], dict]] = None) -> None:
-        super().__init__(
-            backbone=backbone,
-            neck=neck,
-            head=head,
-            data_preprocessor=data_preprocessor,
-            init_cfg=init_cfg)
+                 init_cfg: dict = None,
+                 **kwargs) -> None:
+        super(CAE, self).__init__(init_cfg)
+        assert backbone is not None
+        self.backbone = build_backbone(backbone)
+        self.teacher = build_backbone(backbone)
+        assert neck is not None
+        self.neck = build_neck(neck)
+        assert head is not None
+        self.head = build_head(head)
 
         self.momentum = base_momentum
-        self.teacher = MODELS.build(backbone)
+
+        self.img_norm = Normalize(
+            mean=torch.tensor((0.485, 0.456, 0.406)),
+            std=torch.tensor((0.229, 0.224, 0.225)))
 
     def init_weights(self) -> None:
-        """Initialize weights."""
         super().init_weights()
         self._init_teacher()
 
     def _init_teacher(self) -> None:
-        """Init the weights of teacher with those of backbone."""
+        # init the weights of teacher with those of backbone
         for param_backbone, param_teacher in zip(self.backbone.parameters(),
                                                  self.teacher.parameters()):
             param_teacher.detach()
@@ -67,51 +67,43 @@ class CAE(BaseModel):
             param_teacher.data = param_teacher.data * self.momentum + \
                 param_bacbone.data * (1. - self.momentum)
 
-    def loss(self, inputs: List[torch.Tensor],
-             data_samples: List[SelfSupDataSample],
-             **kwargs) -> Dict[str, torch.Tensor]:
-        """The forward function in training.
+    def extract_feat(self, img: torch.Tensor,
+                     mask: torch.Tensor) -> torch.Tensor:
 
-        Args:
-            inputs (List[torch.Tensor]): The input images.
-            data_samples (List[SelfSupDataSample]): All elements required
-                during the forward function.
+        x = self.backbone(img, mask)
+        return x
 
-        Returns:
-            Dict[str, torch.Tensor]: A dictionary of loss components.
-        """
-        mask = torch.stack(
-            [data_sample.mask.value for data_sample in data_samples])
+    def forward_train(self, samples: Sequence, **kwargs) -> dict:
+        img, img_target, mask = samples
+
+        # normalize images and the images to get the target
+        img_list = [self.img_norm(x).unsqueeze(0) for x in img]
+        img = torch.cat(img_list)
+        img_target = 0.8 * img_target + 0.1
 
         mask = mask.flatten(1).to(torch.bool)
 
-        unmasked = self.backbone(inputs[0], mask)
+        unmasked = self.backbone(img, mask)
 
         # get the latent prediction for the masked patches
         with torch.no_grad():
-            # inputs[0] is the prediction image
-            latent_target = self.teacher(inputs[0], ~mask)
+            latent_target = self.teacher(img, ~mask)
             latent_target = latent_target[:, 1:, :]
             self.momentum_update()
 
-        pos_embed = self.backbone.pos_embed.expand(inputs[0].shape[0], -1, -1)
+        pos_embed = self.backbone.pos_embed.expand(img.shape[0], -1, -1)
         pos_embed_masked = pos_embed[:,
-                                     1:][mask].reshape(inputs[0].shape[0], -1,
+                                     1:][mask].reshape(img.shape[0], -1,
                                                        pos_embed.shape[-1])
         pos_embed_unmasked = pos_embed[:, 1:][~mask].reshape(
-            inputs[0].shape[0], -1, pos_embed.shape[-1])
+            img.shape[0], -1, pos_embed.shape[-1])
 
         # input the unmasked tokens and masked tokens to the decoder
         logits, latent_pred = self.neck(unmasked[:, 1:], pos_embed_masked,
                                         pos_embed_unmasked)
 
         logits = logits.view(-1, logits.shape[-1])
-        # inputs[1] is the target image
-        loss_main, loss_align = self.head(logits, inputs[1], latent_pred,
-                                          latent_target, mask)
-        losses = dict()
 
-        losses['loss'] = loss_main + loss_align
-        losses['main'] = loss_main
-        losses['align'] = loss_align
+        losses = self.head(img_target, logits, latent_pred, latent_target,
+                           mask)
         return losses
