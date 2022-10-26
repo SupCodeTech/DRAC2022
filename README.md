@@ -8,7 +8,7 @@ People with diabetes are more likely to develop retinal lesions than healthy peo
 
 <!-- [ABSTRACT] -->
 
-The code is based on [MMSelfsup v0.9.2](https://github.com/open-mmlab/mmselfsup/tree/v0.9.2) and [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmsegmentation/tree/v0.24.1).
+The code is based on [MMSelfsup v0.10.0](https://github.com/open-mmlab/mmselfsup/tree/v0.10.0) and [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmsegmentation/tree/v0.24.1).
 # Stage I: Pre-task training
 
 The pre-training environment is configured as follows:
