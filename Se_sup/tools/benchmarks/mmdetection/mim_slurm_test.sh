@@ -4,7 +4,7 @@ set -x
 
 PARTITION=$1
 CFG=$2
-PRETRAIN=$3  # pretrained model
+CHECKPOINT=$3
 GPUS=${GPUS:-8}
 GPUS_PER_NODE=${GPUS_PER_NODE:-8}
 CPUS_PER_TASK=${CPUS_PER_TASK:-5}
@@ -15,17 +15,13 @@ PY_ARGS=${@:4}
 WORK_DIR="$(echo ${CFG%.*} | sed -e "s/configs/work_dirs/g")/$(echo $PRETRAIN | rev | cut -d/ -f 1 | rev)"
 
 PYTHONPATH="$(dirname $0)/..":$PYTHONPATH \
-mim train mmdet $CFG \
+mim test mmdet \
+    $CFG \
+    --checkpoint $CHECKPOINT \
     --launcher slurm -G $GPUS \
     --gpus-per-node $GPUS_PER_NODE \
     --cpus-per-task $CPUS_PER_TASK \
     --partition $PARTITION \
     --work-dir $WORK_DIR \
     --srun-args "$SRUN_ARGS" \
-    --cfg-options model.backbone.init_cfg.type=Pretrained \
-    model.backbone.init_cfg.checkpoint=$PRETRAIN \
-    model.backbone.init_cfg.prefix="backbone." \
-    model.roi_head.shared_head.init_cfg.type=Pretrained \
-    model.roi_head.shared_head.init_cfg.checkpoint=$PRETRAIN \
-    model.roi_head.shared_head.init_cfg.prefix="backbone." \
-    $PY_ARGS
+    --cfg-options $PY_ARGS
