@@ -1,7 +1,5 @@
 # DRAC2022 DR Segmentation
 
-`This project is still under construction`
-
 ## Abstract
 
 People with diabetes are more likely to develop retinal lesions than healthy people. However, retinopathy is the leading cause of blindness. At present, for the diagnosis of diabetic retinopathy, it mainly relies on the experienced clinician to recognize the fine features in color fundus images. This is a time-consuming task. In this paper, to detect diabetic retinopathy in fundus images, we propose a novel semi-supervised UW-OCTA semantic segmentation method for diabetic retinal images, MCS-DRNet. This method, first, uses the MAE algorithm to perform semi-supervised pre-training on the UW-OCTA diabetic retinopathy grade classification dataset to mine the supervised information in the images, thereby alleviating the need for labeled data. Secondly, in order to more fully mine the lesion features of each region in the UW-OCTA image, this paper constructs a Cross-Algorithm Ensemble DR lesion tissue segmentation algorithm by deploying three algorithms with different visual feature processing strategies. The algorithm contains three sub-algorithms, namely pre-trained MAE, ConvNeXt and SegFormer. We validate the effectiveness of MCS-DRNet for identifying DR features in UW-OCTA images on the DRAC2022 semantic segmentation dataset, and the method achieves a good score (0.5544 mean DES). 
