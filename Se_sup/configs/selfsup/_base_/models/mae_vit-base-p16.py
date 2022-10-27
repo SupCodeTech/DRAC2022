@@ -12,4 +12,4 @@ model = dict(
         decoder_num_heads=16,
         mlp_ratio=4.,
     ),
-    head=dict(type='MAEFinetuneHead', norm_pix=True, patch_size=16))
+    head=dict(type='MAEPretrainHead', norm_pix=True, patch_size=16))
