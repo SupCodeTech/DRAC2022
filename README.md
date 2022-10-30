@@ -167,7 +167,7 @@ pip install -e .
 ```
 In order to save the running resources of GPU, we train each sub-algorithm separately.
 
-## Running the example script of different sub-algorithm in training Mask A:
+Running the example script of different sub-algorithm in training Mask A:
 Usage:
 ```shell
 python tools/train.py configs/MCS_DRNet/(sub-algorithm)_Task_1_Mask_A_(640x640/1024x1024).py
@@ -180,7 +180,7 @@ Usage:
 ```shell
 python tools/train.py configs/MCS_DRNet/M_Task_1_Mask_A_640x640.py
 ```
-## Running the example script of sub-algorithm C in training Mask B:
+Running the example script of sub-algorithm C in training Mask B:
 
 Usage:
 ```shell
