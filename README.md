@@ -165,7 +165,7 @@ mim install mmcv-full==1.6.0
 cd ./DRAC2022
 pip install -e .
 ```
-## algorithm training phase
+## Algorithm training phase
 In order to save the running resources of GPU, we train each sub-algorithm separately.
 
 Running the example script of different sub-algorithm in training Mask A:
@@ -187,6 +187,9 @@ Usage:
 ```shell
 python tools/train.py configs/MCS_DRNet/C_Task_1_Mask_B_640x640.py
 ```
+
+If your GPU resources are sufficient, you can directly execute `MCS-DRNet.py` for multi-model ensemble training. (The executive file, we will publish it soon.)
+
 ## Testing phase
 
 For the tests of Mask A and B, we provide the test file `MCS_DRNet_Task_1_Mask_A_1536x1536.py` and `MCS_DRNet_Task_1_Mask_B_1536x1536.py`(The document will soon be published).
