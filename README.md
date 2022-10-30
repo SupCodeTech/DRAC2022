@@ -165,6 +165,7 @@ mim install mmcv-full==1.6.0
 cd ./DRAC2022
 pip install -e .
 ```
+## algorithm training phase
 In order to save the running resources of GPU, we train each sub-algorithm separately.
 
 Running the example script of different sub-algorithm in training Mask A:
