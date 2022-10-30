@@ -188,7 +188,7 @@ Usage:
 python tools/train.py configs/MCS_DRNet/C_Task_1_Mask_B_640x640.py
 ```
 
-If your GPU resources are sufficient, you can directly execute `MCS-DRNet.py` for multi-model ensemble training. (The executive file, we will publish it soon.)
+If your GPU resources are sufficient, you can directly execute `MCS-DRNet.py` in the directory `configs/MCS_DRNet` for multi-model ensemble training. (The executive file, we will publish it soon.)
 
 ## Testing phase
 
