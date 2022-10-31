@@ -18,8 +18,8 @@ model = dict(
         out_indices=[3, 5, 7, 11]),
     neck=dict(embed_dim=768, rescales=[4, 2, 1, 0.5]),
     decode_head=dict(
-        in_channels=[768, 768, 768, 768], num_classes=2, channels=768),
-    auxiliary_head=dict(in_channels=768, num_classes=2),
+        in_channels=[768, 768, 768, 768], num_classes=3, channels=768),
+    auxiliary_head=dict(in_channels=768, num_classes=3),
     test_cfg=dict(mode='slide', crop_size=(640, 640), stride=(341, 341)))
 
 optimizer = dict(
