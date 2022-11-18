@@ -7,7 +7,7 @@ _base_ = [
 ]
 
 # dataset
-data = dict(samples_per_gpu=64, workers_per_gpu=8)
+data = dict(samples_per_gpu=8, workers_per_gpu=2)
 
 # optimizer
 optimizer = dict(
@@ -32,10 +32,10 @@ lr_config = dict(
     by_epoch=False)
 
 # schedule
-runner = dict(max_epochs=16000)
+runner = dict(max_epochs=13000)
 
 # runtime
-checkpoint_config = dict(interval=16000, max_keep_ckpts=1, out_dir='')
+checkpoint_config = dict(interval=6500, max_keep_ckpts=2, out_dir='')
 persistent_workers = True
 log_config = dict(
     interval=10, hooks=[
