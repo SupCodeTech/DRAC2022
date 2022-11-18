@@ -43,7 +43,7 @@ class MAEPretrainDecoder(BaseModule):
     """
 
     def __init__(self,
-                 num_patches=196,
+                 num_patches=784,
                  patch_size=16,
                  in_chans=3,
                  embed_dim=1024,
