@@ -10,7 +10,7 @@ The code is based on [MMSelfsup v0.10.0](https://github.com/open-mmlab/mmselfsup
 The pre-training environment is configured as follows:
 ```shell
 pip install openmim
-mim install mmcv-full
+mim install mmcv-full==1.6.0
 pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.10/index.html
 cd ./DRAC2022/Se_sup/
 pip install -e .
