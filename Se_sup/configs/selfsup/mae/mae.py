@@ -32,10 +32,10 @@ lr_config = dict(
     by_epoch=False)
 
 # schedule
-runner = dict(max_epochs=4800)
+runner = dict(max_epochs=3200)
 
 # runtime
-checkpoint_config = dict(interval=1600, max_keep_ckpts=3, out_dir='')
+checkpoint_config = dict(interval=800, max_keep_ckpts=4, out_dir='')
 persistent_workers = True
 log_config = dict(
     interval=10, hooks=[
