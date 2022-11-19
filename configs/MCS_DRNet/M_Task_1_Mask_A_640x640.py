@@ -4,7 +4,7 @@ _base_ = [
 ]
 
 model = dict(
-    pretrained='./Se_sup/work_dirs/mae/pretrain_backbone_4800.pth',
+    pretrained='./Se_sup/work_dirs/mae/pretrain_backbone_3200.pth',
     backbone=dict(
         type='MAE',
         img_size=(640, 640),
@@ -57,7 +57,7 @@ test_pipeline = [
         # img_ratios=[0.5, 0.75, 1.0, 1.25, 1.5, 1.75],
         flip=True,
         transforms=[
-            dict(type='Resize', keep_ratio=True, min_size=512),
+            dict(type='Resize', keep_ratio=True, min_size=640),
             dict(type='RandomFlip'),
             dict(type='Normalize', **img_norm_cfg),
             dict(type='ImageToTensor', keys=['img']),
