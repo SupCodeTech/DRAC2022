@@ -59,13 +59,13 @@ After the above statement runs, the pre-trained MAE model will be saved in the f
 ├── Se_sup
 │   ├── work_dirs
 │   │   ├── mae
-│   │   │   ├── epoch_3200.pth
+│   │   │   ├── epoch_1600.pth
 ```
 
 Then, please run the following shell statement in the `Se_sup` directory to obtain the backbone of pre-trained MAE-ViT.
 
 ```shell
-python tools/model_converters/extract_backbone_weights.py work_dirs/mae/epoch_3200.pth work_dirs/mae/pretrain_backbone_3200.pth
+python tools/model_converters/extract_backbone_weights.py work_dirs/mae/epoch_1600.pth work_dirs/mae/pretrain_backbone_1600.pth
 ```
 
 After running, the model is saved in the following directory：
@@ -74,7 +74,7 @@ After running, the model is saved in the following directory：
 ├── Se_sup
 │   ├── work_dirs
 │   │   ├── mae
-│   │   │   ├── pretrain_backbone_3200.pth
+│   │   │   ├── pretrain_backbone_1600.pth
 ```
 
 # Stage II: Semantic segmentation
