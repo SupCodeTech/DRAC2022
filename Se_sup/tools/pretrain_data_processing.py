@@ -55,27 +55,27 @@ file.close()
 img_dir = './C._Diabetic_Retinopathy_Grading/1._Original_Images/a._Training_Set'
 
 for file in mmcv.scandir(img_dir, suffix='.png'):
-  Original_image_448 = cv2.imread(img_dir + '/' + file, 1)
-  Original_image_448 = Image.fromarray(Original_image_448).convert('RGB')
-  Original_image_448 = Original_image_448.resize((448, 448), Image.ANTIALIAS)
+  Original_image_480 = cv2.imread(img_dir + '/' + file, 1)
+  Original_image_480 = Image.fromarray(Original_image_480).convert('RGB')
+  Original_image_480 = Original_image_480.resize((480, 480), Image.ANTIALIAS)
   Data_path_ = './Data/Original_Images/Training_Set'
   Data_path_folder = os.path.exists(Data_path_)
   if not Data_path_folder:
     os.makedirs(Data_path_)
   # raw 224 image saving
-  Original_image_448.save(osp.join("./Data/Original_Images/Training_Set", file.replace('.png','.jpg')))
+  Original_image_480.save(osp.join("./Data/Original_Images/Training_Set", file.replace('.png','.jpg')))
   # Flip horizontal
-  image_448_flip_left_right = Original_image_448.transpose(Image.FLIP_LEFT_RIGHT)
-  image_448_flip_left_right.save(osp.join("./Data/Original_Images/Training_Set", "00_" + file.replace('.png','.jpg')))
+  image_480_flip_left_right = Original_image_480.transpose(Image.FLIP_LEFT_RIGHT)
+  image_480_flip_left_right.save(osp.join("./Data/Original_Images/Training_Set", "00_" + file.replace('.png','.jpg')))
   # Flip vertical
-  image_448_flip_top_bottom = Original_image_448.transpose(Image.FLIP_TOP_BOTTOM)
-  image_448_flip_top_bottom.save(osp.join("./Data/Original_Images/Training_Set", "11_" + file.replace('.png','.jpg')))
+  image_480_flip_top_bottom = Original_image_480.transpose(Image.FLIP_TOP_BOTTOM)
+  image_480_flip_top_bottom.save(osp.join("./Data/Original_Images/Training_Set", "11_" + file.replace('.png','.jpg')))
   # rotate 90 640 raw image saving
-  image_448_90 = Original_image_448.rotate(90, expand=1)
-  image_448_90.save(osp.join("./Data/Original_Images/Training_Set", "90_" + file.replace('.png','.jpg')))
+  image_480_90 = Original_image_480.rotate(90, expand=1)
+  image_480_90.save(osp.join("./Data/Original_Images/Training_Set", "90_" + file.replace('.png','.jpg')))
   # rotate 180 640 raw image saving
-  image_448_180 = Original_image_448.rotate(180, expand=1)
-  image_448_180.save(osp.join("./Data/Original_Images/Training_Set", "180_" + file.replace('.png','.jpg')))
+  image_480_180 = Original_image_480.rotate(180, expand=1)
+  image_480_180.save(osp.join("./Data/Original_Images/Training_Set", "180_" + file.replace('.png','.jpg')))
   # rotate 270 640 raw image saving
-  image_448_270 = Original_image_448.rotate(270, expand=1)
-  image_448_270.save(osp.join("./Data/Original_Images/Training_Set", "270_" + file.replace('.png','.jpg')))
+  image_480_270 = Original_image_480.rotate(270, expand=1)
+  image_480_270.save(osp.join("./Data/Original_Images/Training_Set", "270_" + file.replace('.png','.jpg')))
