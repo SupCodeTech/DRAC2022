@@ -43,7 +43,7 @@ class MAEViT(VisionTransformer):
 
     def __init__(self,
                  arch='b',
-                 img_size=448,
+                 img_size=480,
                  patch_size=16,
                  out_indices=-1,
                  drop_rate=0,
