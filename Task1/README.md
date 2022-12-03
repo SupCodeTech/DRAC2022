@@ -12,7 +12,7 @@ The pre-training environment is configured as follows:
 pip install openmim
 mim install mmcv-full==1.6.0
 pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.10/index.html
-cd ./DRAC2022/Se_sup/
+cd ./Task1/Se_sup/
 pip install -e .
 ```
 If you encounter problems with environment configuration, please refer to [MMSelfsup v0.10.0](https://github.com/open-mmlab/mmselfsup/tree/v0.10.0) .
@@ -159,7 +159,7 @@ gcc --version
 pip install torch==1.12.0 torchvision --extra-index-url https://download.pytorch.org/whl/cu113
 pip install openmim
 mim install mmcv-full==1.6.0
-cd ./DRAC2022
+cd ./Task1
 pip install -e .
 ```
 ## Algorithm training phase
