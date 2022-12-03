@@ -154,8 +154,6 @@ Due to the limited data available for this contest, we did not set the validatio
 ## Semantic segmentation environment configuration
 
 ```shell
-nvcc -V
-gcc --version
 pip install torch==1.12.0 torchvision --extra-index-url https://download.pytorch.org/whl/cu113
 pip install openmim
 mim install mmcv-full==1.6.0
