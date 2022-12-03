@@ -15,7 +15,7 @@ pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.1
 cd ./Task1/Se_sup/
 pip install -e .
 ```
-Note: plz configure the lab environment before proceeding to the following steps. If you encounter problems with environment configuration, please refer to [MMSelfsup v0.10.0](https://github.com/open-mmlab/mmselfsup/tree/v0.10.0) .
+Note: please configure the lab environment before proceeding to the following steps. If you encounter problems with environment configuration, please refer to [MMSelfsup v0.10.0](https://github.com/open-mmlab/mmselfsup/tree/v0.10.0) .
 
 Then, download the DRAC Task 3 dataset and unzip it. Save the data in the following directory:
 
@@ -88,7 +88,7 @@ mim install mmcv-full==1.6.0
 cd ./Task1
 pip install -e .
 ```
-Note: plz configure the lab environment before proceeding to the following steps. If you encounter problems with environment configuration, please refer to [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmsegmentation/tree/v0.24.1).
+Note: please configure the lab environment before proceeding to the following steps. If you encounter problems with environment configuration, please refer to [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmsegmentation/tree/v0.24.1).
 
 ## Semantic segmentation data preprocessing
 
