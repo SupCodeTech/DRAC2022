@@ -62,7 +62,7 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   Data_path_folder = os.path.exists(Data_path_)
   if not Data_path_folder:
     os.makedirs(Data_path_)
-  # raw 224 image saving
+  # raw image saving
   Original_image_480.save(osp.join("./Data/Original_Images/Training_Set", file.replace('.png','.jpg')))
   # Flip horizontal
   image_480_flip_left_right = Original_image_480.transpose(Image.FLIP_LEFT_RIGHT)
@@ -70,12 +70,12 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   # Flip vertical
   image_480_flip_top_bottom = Original_image_480.transpose(Image.FLIP_TOP_BOTTOM)
   image_480_flip_top_bottom.save(osp.join("./Data/Original_Images/Training_Set", "11_" + file.replace('.png','.jpg')))
-  # rotate 90 640 raw image saving
+  # rotate 90 raw image saving
   image_480_90 = Original_image_480.rotate(90, expand=1)
   image_480_90.save(osp.join("./Data/Original_Images/Training_Set", "90_" + file.replace('.png','.jpg')))
-  # rotate 180 640 raw image saving
+  # rotate 180 raw image saving
   image_480_180 = Original_image_480.rotate(180, expand=1)
   image_480_180.save(osp.join("./Data/Original_Images/Training_Set", "180_" + file.replace('.png','.jpg')))
-  # rotate 270 640 raw image saving
+  # rotate 270 raw image saving
   image_480_270 = Original_image_480.rotate(270, expand=1)
   image_480_270.save(osp.join("./Data/Original_Images/Training_Set", "270_" + file.replace('.png','.jpg')))
