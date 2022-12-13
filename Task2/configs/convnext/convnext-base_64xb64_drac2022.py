@@ -22,8 +22,8 @@ custom_hooks = [dict(type='EMAHook', momentum=4e-5, priority='ABOVE_NORMAL')]
 # based on the actual training batch size.
 # base_batch_size = (32 GPUs) x (128 samples per GPU)
 auto_scale_lr = dict(base_batch_size=8)
-runner = dict(type='EpochBasedRunner', max_epochs=50)
-checkpoint_config = dict(by_epoch=True, interval=5)
+runner = dict(type='EpochBasedRunner', max_epochs=220)
+checkpoint_config = dict(by_epoch=True, interval=70)
 
 default_hooks = dict(
     timer=dict(type='IterTimerHook'),
