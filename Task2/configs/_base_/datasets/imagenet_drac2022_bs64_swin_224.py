@@ -58,9 +58,9 @@ train_dataloader = dict(
     num_workers=2,
     dataset=dict(
         type=dataset_type,
-        data_root='/content/drive/MyDrive/DRAC_For_Task2',
-        ann_file='/content/drive/MyDrive/DRAC_For_Task2/Corruption_OA.txt',
-        data_prefix='DRAC2022_Task2_for_training_expension_mask',
+        data_root='Task2',
+        ann_file='Task2/Data/Training_Corruption_OA.txt',
+        data_prefix='Corruption_OA_training',
         pipeline=train_pipeline),
     sampler=dict(type='DefaultSampler', shuffle=True),
 )
@@ -70,9 +70,9 @@ val_dataloader = dict(
     num_workers=2,
     dataset=dict(
         type=dataset_type,
-        data_root='/content/drive/MyDrive/DRAC_For_Task2/',
-        ann_file='/content/drive/MyDrive/DRAC_For_Task2/Label/training_labels.txt',
-        data_prefix='DRAC2022_Task2_for_training',
+        data_root='Task2',
+        ann_file='Task2/Data/Test_Corruption_OA.txt',
+        data_prefix='Corruption_OA_training',
         pipeline=test_pipeline),
     sampler=dict(type='DefaultSampler', shuffle=False),
 )
