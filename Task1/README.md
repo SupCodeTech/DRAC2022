@@ -1,4 +1,4 @@
-# DRAC2022(MICCAI2022) DR Segmentation
+# DRAC2022 (MICCAI2022) DR Segmentation
 
 `This project is still under construction` 
 
