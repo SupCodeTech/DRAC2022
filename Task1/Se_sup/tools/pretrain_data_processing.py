@@ -35,11 +35,11 @@ output_list_ = []
 
 for i in range(611):
   output_list.append(image_name[i][:-4] + ".jpg")
-  output_list.append("00_" + image_name[i][:-4] + ".jpg")
-  output_list.append("11_" + image_name[i][:-4] + ".jpg")
-  output_list.append("90_" + image_name[i][:-4] + ".jpg")
-  output_list.append("180_" + image_name[i][:-4] + ".jpg")
-  output_list.append("270_" + image_name[i][:-4] + ".jpg")
+  output_list.append("009" + image_name[i][:-4] + ".jpg")
+  output_list.append("119" + image_name[i][:-4] + ".jpg")
+  output_list.append("909" + image_name[i][:-4] + ".jpg")
+  output_list.append("1809" + image_name[i][:-4] + ".jpg")
+  output_list.append("2709" + image_name[i][:-4] + ".jpg")
   for j in range(6):
     output_list_.append(DR_grade[i])
     
@@ -66,16 +66,16 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   Original_image_480.save(osp.join("./Data/Original_Images/Training_Set", file.replace('.png','.jpg')))
   # Flip horizontal
   image_480_flip_left_right = Original_image_480.transpose(Image.FLIP_LEFT_RIGHT)
-  image_480_flip_left_right.save(osp.join("./Data/Original_Images/Training_Set", "00_" + file.replace('.png','.jpg')))
+  image_480_flip_left_right.save(osp.join("./Data/Original_Images/Training_Set", "009" + file.replace('.png','.jpg')))
   # Flip vertical
   image_480_flip_top_bottom = Original_image_480.transpose(Image.FLIP_TOP_BOTTOM)
-  image_480_flip_top_bottom.save(osp.join("./Data/Original_Images/Training_Set", "11_" + file.replace('.png','.jpg')))
+  image_480_flip_top_bottom.save(osp.join("./Data/Original_Images/Training_Set", "119" + file.replace('.png','.jpg')))
   # rotate 90 raw image saving
   image_480_90 = Original_image_480.rotate(90, expand=1)
-  image_480_90.save(osp.join("./Data/Original_Images/Training_Set", "90_" + file.replace('.png','.jpg')))
+  image_480_90.save(osp.join("./Data/Original_Images/Training_Set", "909" + file.replace('.png','.jpg')))
   # rotate 180 raw image saving
   image_480_180 = Original_image_480.rotate(180, expand=1)
-  image_480_180.save(osp.join("./Data/Original_Images/Training_Set", "180_" + file.replace('.png','.jpg')))
+  image_480_180.save(osp.join("./Data/Original_Images/Training_Set", "1809" + file.replace('.png','.jpg')))
   # rotate 270 raw image saving
   image_480_270 = Original_image_480.rotate(270, expand=1)
-  image_480_270.save(osp.join("./Data/Original_Images/Training_Set", "270_" + file.replace('.png','.jpg')))
+  image_480_270.save(osp.join("./Data/Original_Images/Training_Set", "2709" + file.replace('.png','.jpg')))
