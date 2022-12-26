@@ -195,8 +195,8 @@ For Mask `A` and `B` prediction, we provide the data processing file `Test_Data_
 │   ├── Segmentation
 │   │   ├── ...
 │   ├── Test_Data
-│   │   ├── Original Images
-│   │   │   ├── Testing Set
+│   │   ├── Original_Images
+│   │   │   ├── Testing_Set
 │   │   │   │   ├── 086.png
 │   │   │   │   ├── ...
 ```
