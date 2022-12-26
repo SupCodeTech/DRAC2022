@@ -1,1 +1,5 @@
-
+Directory:
+ - A._Segmentation (Directory of raw data)
+ - Segmentation (The directory after data enhancement)
+ - Test_Image (The directory where the original test images are saved)
+ - Test_Image_ (The directory where the test image is saved after enhancement)
