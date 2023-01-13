@@ -32,6 +32,9 @@ For convenience, we strongly recommend downloading our preprocessed data set (Fo
 
 Note: Due to the large randomness of Mask patch generation, different Mask conditions correspond to different performance. Therefore, using our data set can maximize the avoidance of this problem.
 
+Data preprocessing file `Data_preprocessing.py` , will be released soon.
+
+
 The environment is configured as follows:
 ```shell
 pip install gdown -q
