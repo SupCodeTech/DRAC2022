@@ -1,3 +1,4 @@
-ConVneXt
-EfficientNetV2
-Xception
+Create the following directory:
+ - ConVneXt
+ - EfficientNetV2
+ - Xception
