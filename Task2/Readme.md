@@ -1,4 +1,33 @@
 # DRAC2022 (MICCAI2022) DR Image Quality Assessment
 
-We are currently working on this project. Details will be available here soon.
-Please stay tuned.
+`This project is still under construction` 
+
+For convenience, we strongly recommend downloading our preprocessed data set (For [training set](https://drive.google.com/file/d/1zA1XwS58fHcAAAQalbQp9QBzGUIMqli5/view?usp=sharing) and [test set](https://drive.google.com/file/d/1gp39JwzZFfFqu8yH-TkvFusL60p1HOGs/view?usp=sharing)), and unzip it. Save the data in the following directory:
+
+```none
+├── Data
+│   ├── TrainingOAMASK
+│   │   ├── High
+│   │   │   ├── 885.jpg
+│   │   │   ├── ...
+│   │   ├── Low
+│   │   │   ├── 1.jpg
+│   │   │   ├── ...
+│   │   ├── Med
+│   │   │   ├── 302.jpg
+│   │   │   ├── ...
+│   ├── ValOA
+│   │   ├── High
+│   │   │   ├── 3941.jpg
+│   │   │   ├── ...
+│   │   ├── Low
+│   │   │   ├── 289.jpg
+│   │   │   ├── ...
+│   │   ├── Med
+│   │   │   ├── 848.jpg
+│   │   │   ├── ...
+```
+
+Note: Due to the large randomness of Mask patch generation, different Mask conditions correspond to different performance. Therefore, using our data set can maximize the avoidance of this problem.
+
+
