@@ -36,6 +36,7 @@ The environment is configured as follows:
 ```shell
 pip install gdown -q
 pip install jax==0.3.13 jaxlib==0.3.10 -q
+pip install pyyaml h5py  
 ```
 For ConvNeXt's training, we need to use install tensorflow 2.10.0:
 ```shell
