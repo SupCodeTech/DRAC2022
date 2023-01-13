@@ -32,4 +32,16 @@ For convenience, we strongly recommend downloading our preprocessed data set (Fo
 
 Note: Due to the large randomness of Mask patch generation, different Mask conditions correspond to different performance. Therefore, using our data set can maximize the avoidance of this problem.
 
-
+The environment is configured as follows:
+```shell
+pip install gdown -q
+pip install jax==0.3.13 jaxlib==0.3.10 -q
+```
+For ConvNeXt's training, we need to use install tensorflow 2.10.0:
+```shell
+pip install tensorflow==2.10.0
+```
+For EfficientNetV2's training, we need to use install tensorflow 2.9.2:
+```shell
+pip install tensorflow==2.9.2
+```
