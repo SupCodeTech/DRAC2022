@@ -2,7 +2,7 @@
 
 `This project is still under construction` 
 
-For convenience, we strongly recommend downloading our preprocessed data set (For [training set](https://drive.google.com/file/d/1zA1XwS58fHcAAAQalbQp9QBzGUIMqli5/view?usp=sharing) and [test set](https://drive.google.com/file/d/1gp39JwzZFfFqu8yH-TkvFusL60p1HOGs/view?usp=sharing)), and unzip it. Save the data in the following directory:
+For convenience, we strongly recommend downloading our preprocessed data set (For [training set](https://drive.google.com/file/d/1zA1XwS58fHcAAAQalbQp9QBzGUIMqli5/view?usp=sharing) and [test set](https://drive.google.com/file/d/1GndQtL1G0a9hEDsVNaiMxTCe4oEaOWx4/view?usp=share_link)), and unzip it. Save the data in the following directory:
 
 ```none
 ├── Data
