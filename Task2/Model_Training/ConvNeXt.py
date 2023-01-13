@@ -268,7 +268,7 @@ model_ = Model(inputs=convnext.input, outputs=output)
 
 # 构建 checkpoint file
 
-checkpoint_path = "./checkpoint/ConvNeXt.ckpt"
+checkpoint_path = "./checkpoint/ConvNeXt/ConvNeXt.ckpt"
 
 # Create a callback that saves the model's weights
 cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
