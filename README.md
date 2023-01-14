@@ -1,6 +1,6 @@
 # DRAC2022 (MICCAI2022)
 
-`Our project is still under construction` 
+`We are currently working on this project. Please stay tuned.` 
 
 Papers accepted by the [25th International Conference on Medical Image Computing and Computer Assisted Intervention](https://conferences.miccai.org/2022/en/) (MICCAI2022):
 
