@@ -8,14 +8,12 @@ Image Quality Assessment based on Multi-Model Ensemble Class-Imbalance Repair Al
 
 If our work is helpful to you, please cite the following papers:
 
+```latex
 @article{tan2022semi,
-
    title={Semi-Supervised Semantic Segmentation Methods for UW-OCTA Diabetic Retinopathy Grade Assessment},
-  
    author={Tan, Zhuoyi and Madzin, Hizmawati and Ding, Zeyu},
-  
    journal={arXiv preprint arXiv:2212.13486},
-  
    year={2022}
-  
 }
+```
+
