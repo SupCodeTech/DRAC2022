@@ -1,5 +1,7 @@
 # DRAC2022 (MICCAI2022)
 
+`Our project is still under construction` 
+
 Papers accepted by MICCAI2022:
 
 Semi-Supervised Semantic Segmentation Methods for UW-OCTA Diabetic Retinopathy Grade Assessment (For Task 1 and 3)
