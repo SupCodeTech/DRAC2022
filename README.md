@@ -2,7 +2,7 @@
 
 `Our project is still under construction` 
 
-Papers accepted by MICCAI2022:
+Papers accepted by the [25th International Conference on Medical Image Computing and Computer Assisted Intervention](https://conferences.miccai.org/2022/en/) (MICCAI2022):
 
 `For Task 1 and 3`: Semi-Supervised Semantic Segmentation Methods for UW-OCTA Diabetic Retinopathy Grade Assessment 
 
