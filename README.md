@@ -10,11 +10,12 @@ If our work is helpful to you, please cite the following papers:
 
 @article{tan2022semi,
 
-  title={Semi-Supervised Semantic Segmentation Methods for UW-OCTA Diabetic Retinopathy Grade Assessment},
+    title={Semi-Supervised Semantic Segmentation Methods for UW-OCTA Diabetic Retinopathy Grade Assessment},
   
-  author={Tan, Zhuoyi and Madzin, Hizmawati and Ding, Zeyu},
+    author={Tan, Zhuoyi and Madzin, Hizmawati and Ding, Zeyu},
   
-  journal={arXiv preprint arXiv:2212.13486},
+    journal={arXiv preprint arXiv:2212.13486},
   
-  year={2022}
+    year={2022}
+  
 }
