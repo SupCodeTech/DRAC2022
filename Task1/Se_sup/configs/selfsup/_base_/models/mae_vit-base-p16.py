@@ -1,7 +1,7 @@
 # model settings
 model = dict(
     type='MAE',
-    backbone=dict(type='MAEViT', arch='b', patch_size=16, mask_ratio=0.75),
+    backbone=dict(type='MAEViT', arch='b', patch_size=16, mask_ratio=0.60),
     neck=dict(
         type='MAEPretrainDecoder',
         patch_size=16,
