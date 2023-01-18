@@ -261,7 +261,7 @@ convnext = tf.keras.applications.convnext.ConvNeXtLarge(
     classifier_activation='softmax'
 )
 conv = convnext.layers[-1].output
-# conv = Dropout(0.5)(conv)
+conv = Dropout(0.5)(conv)
 output = Flatten()(conv)
 output = Dense(3, activation='softmax')(output)
 model_ = Model(inputs=convnext.input, outputs=output)
