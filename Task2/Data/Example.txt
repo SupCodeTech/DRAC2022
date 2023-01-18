@@ -1,0 +1,22 @@
+Prepare the following directory:
+
+├── TrainingOAMASK
+│   ├── High
+│   │   ├── 885.jpg
+│   │   ├── ...
+│   ├── Low
+│   │   ├── 1.jpg
+│   │   ├── ...
+│   ├── Med
+│   │   ├── 302.jpg
+│   │   ├── ...
+├── ValOA
+│   ├── High
+│   ├── 3941.jpg
+│   │   ├── ...
+│   ├── Low
+│   │   ├── 289.jpg
+│   │   ├── ...
+│   ├── Med
+│   │   ├── 848.jpg
+│   │   ├── ...
