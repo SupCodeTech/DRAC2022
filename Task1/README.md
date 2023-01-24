@@ -12,7 +12,7 @@ The pre-training environment is configured as follows:
 pip install openmim
 mim install mmcv-full==1.6.0
 pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.10/index.html
-cd ./Task1/Se_sup/
+cd ./Se_sup/
 pip install -e .
 ```
 Note: please configure the lab environment before proceeding to the following steps. If you encounter problems with environment configuration, please refer to [MMSelfsup v0.10.0](https://github.com/open-mmlab/mmselfsup/tree/v0.10.0) .
