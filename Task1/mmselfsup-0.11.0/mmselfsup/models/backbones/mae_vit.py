@@ -43,7 +43,7 @@ class MAEViT(VisionTransformer):
 
     def __init__(self,
                  arch='b',
-                 img_size=224,
+                 img_size=480,
                  patch_size=16,
                  out_indices=-1,
                  drop_rate=0,
@@ -54,7 +54,7 @@ class MAEViT(VisionTransformer):
                  interpolate_mode='bicubic',
                  patch_cfg=dict(),
                  layer_cfgs=dict(),
-                 mask_ratio=0.75,
+                 mask_ratio=0.65,
                  init_cfg=None):
         super().__init__(
             arch=arch,
