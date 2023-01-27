@@ -9,7 +9,6 @@ The code is based on [MMSelfsup v0.11.0](https://github.com/open-mmlab/mmselfsup
 
 The pre-training environment is configured as follows:
 ```shell
-%cd /content/drive/MyDrive/DRAC2022/Task1
 pip install torch==1.12.0 torchvision --extra-index-url https://download.pytorch.org/whl/cu113
 # Install MMCV
 pip install openmim
