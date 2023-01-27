@@ -4,18 +4,20 @@
 
 <!-- [ABSTRACT] -->
 
-The code is based on [MMSelfsup v0.10.0](https://github.com/open-mmlab/mmselfsup/tree/v0.10.0) and [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmsegmentation/tree/v0.24.1).
+The code is based on [MMSelfsup v0.11.0](https://github.com/open-mmlab/mmselfsup/tree/v0.11.0) and [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmsegmentation/tree/v0.24.1).
 # Stage I: Pre-task training
 
 The pre-training environment is configured as follows:
 ```shell
+%cd /content/drive/MyDrive/DRAC2022/Task1
+pip install torch==1.12.0 torchvision --extra-index-url https://download.pytorch.org/whl/cu113
+# Install MMCV
 pip install openmim
 mim install mmcv-full==1.6.0
-pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.10/index.html
-cd ./Se_sup/
+cd ./mmselfsup-0.11.0/
 pip install -e .
 ```
-Note: please configure the lab environment before proceeding to the following steps. If you encounter problems with environment configuration, please refer to [MMSelfsup v0.10.0](https://github.com/open-mmlab/mmselfsup/tree/v0.10.0) .
+Note: please configure the lab environment before proceeding to the following steps. If you encounter problems with environment configuration, please refer to [MMSelfsup v0.11.0](https://github.com/open-mmlab/mmselfsup/tree/v0.11.0) .
 
 Then, download the DRAC Task 3 dataset and unzip it. Save the data in the following directory:
 
@@ -30,7 +32,7 @@ Then, download the DRAC Task 3 dataset and unzip it. Save the data in the follow
 │   │   │   ├── a._DRAC2022_Diabetic_Retinopathy_Grading_Training_Labels.csv
 ```
 
-In directory `/DRAC2022/Se_sup/`, by using the `pretrain_data_processing.py`, 
+In directory `/DRAC2022/mmselfsup-0.11.0/`, by using the `pretrain_data_processing.py`, 
 
 ```shell
 python tools/pretrain_data_processing.py
@@ -50,7 +52,7 @@ the processing data will be saved in the following directory:
 Next, we run the following statement to begin our pre-training：
 
 ```shell
-python tools/train.py configs/selfsup/mae/mae.py
+python tools/train.py configs/selfsup/mae/mae_vit-base-p16-1600e_drac2022.py
 ```
 
 After the above statement runs, the pre-trained MAE model will be saved in the following directory:
