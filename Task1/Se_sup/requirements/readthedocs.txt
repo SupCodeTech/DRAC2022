@@ -1,6 +1,0 @@
-faiss-cpu
-mmcv>=1.4.2
-mmselfsup
-sklearn
-torch
-torchvision
