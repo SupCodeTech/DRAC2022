@@ -60,7 +60,7 @@ After the above statement runs, the pre-trained MAE model will be saved in the f
 ```none
 ├── Se_sup
 │   ├── work_dirs
-│   │   ├── mae
+│   │   ├── mae_vit-base-p16-1600e_drac2022
 │   │   │   ├── epoch_1600.pth
 ```
 
