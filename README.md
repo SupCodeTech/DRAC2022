@@ -1,4 +1,4 @@
-# Diabetic Retinopathy Analysis Challenge 2022 (MICCAI2022)
+# Diabetic Retinopathy Analysis Challenge 2022 (DRAC2022)
 
 `We are currently working on this project. Please stay tuned.` 
 
