@@ -6,7 +6,7 @@ _base_ = [
 ]
 
 # dataset
-data = dict(samples_per_gpu=16, workers_per_gpu=4)
+data = dict(samples_per_gpu=32, workers_per_gpu=4)
 
 # optimizer
 optimizer = dict(
