@@ -4,8 +4,7 @@
 
 Papers accepted by the [25th International Conference on Medical Image Computing and Computer Assisted Intervention](https://conferences.miccai.org/2022/en/) (MICCAI2022):
 
-`For Task 1 and 3`: Semi-Supervised Semantic Segmentation Methods for UW-OCTA Diabetic Retinopathy Grade Assessment 
-
+`For Task 1 and 3`: [Semi-Supervised Semantic Segmentation Methods for UW-OCTA Diabetic Retinopathy Grade Assessment](https://arxiv.org/pdf/2212.13486.pdf)
 
 The methods (MCSDR-Net v1) constructed by my team (Galactic Fleet) was placed 7th (0,5161 mDice) in the DRAC2022 Semantic Segmentation (Task1) challenge.
 
