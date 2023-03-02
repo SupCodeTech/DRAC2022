@@ -1,8 +1,5 @@
-# 测试
-
 import torch, torchvision
 print(torch.__version__, torch.cuda.is_available())
-
 # Check MMSegmentation installation
 import mmseg
 print(mmseg.__version__)
@@ -16,67 +13,44 @@ import os
 import os.path as osp
 import time
 import warnings
-
+import numpy as np
+from PIL import Image
 import mmcv
 import torch
 import torch.distributed as dist
 from mmcv.cnn.utils import revert_sync_batchnorm
 from mmcv.runner import get_dist_info, init_dist
 from mmcv.utils import Config, DictAction, get_git_hash
-
+from argparse import ArgumentParser
 from mmseg import __version__
 from mmseg.apis import init_random_seed, set_random_seed, train_segmentor
 from mmseg.datasets import build_dataset
 from mmseg.models import build_segmentor
 from mmseg.utils import collect_env, get_root_logger, setup_multi_processes
 
-def parse_args():
-  parser = argparse.ArgumentParser(description='Test a MCS-DRNet')
-  parser.add_argument('--load-from-checkpoint-M', help='the dir to save logs and models')
-  parser.add_argument('--load-from-checkpoint-C', help='the dir to save logs and models')
-  parser.add_argument('--load-from-checkpoint-S', help='the dir to save logs and models')
-  parser.add_argument('--output-data-dir', help='the dir to save logs and models')
-
-
-  args = parser.parse_args()
-  if 'LOCAL_RANK' not in os.environ:
-    os.environ['LOCAL_RANK'] = str(args.local_rank)
-  if args.options and args.cfg_options:
-    raise ValueError(
-            '--options and --cfg-options cannot be both '
-            'specified, --options is deprecated in favor of --cfg-options. '
-            '--options will not be supported in version v0.22.0.')
-  if args.options:
-    warnings.warn('--options is deprecated in favor of --cfg-options. '
-                      '--options will not be supported in version v0.22.0.')
-    args.cfg_options = args.options
-  return args
  
 def main():
-
-  args = parse_args()
-  cfg = Config.fromfile(args.config)
-  if args.load_from_checkpoint_M is not None:
-    checkpoint_file_MAE_Mask_A = args.load_from_checkpoint_M
-  if args.load_from_checkpoint_C is not None:
-    checkpoint_file_ConvNeXt_XL_Mask_A = args.load_from_checkpoint_C
-  if args.load_from_checkpoint_S is not None:
-    checkpoint_file_SegFormer_Mask_A = args.load_from_checkpoint_S
-  if args.data_dir is not None:
-    output_data_dir = args.output-data-dir
-
-  config_file_MAE_Mask_A = './configs/MCS_DRNet/M_Task_1_Mask_A_640x640.py'
-  config_file_convnext_XL_Mask_A = './configs/MCS_DRNet/C_Task_1_Mask_A_640x640.py'
-  config_file_segFormer_Mask_A = './configs/MCS_DRNet/S_Task_1_Mask_A_1024x1024.py'
-  
-  M = init_segmentor(config_file_MAE_Mask_A, checkpoint_file_MAE_Mask_A,  device='cuda:0')
-  C = init_segmentor(config_file_convnext_XL_Mask_A, checkpoint_file_ConvNeXt_XL_Mask_A,  device='cuda:0')
-  S = init_segmentor(config_file_segFormer_Mask_A, checkpoint_file_SegFormer_Mask_A,  device='cuda:0')
+  parser = ArgumentParser()
+  parser.add_argument('load_from_M_config', help='path to store the config of the pretrained model MAE')
+  parser.add_argument('load_from_checkpoint_M', help='path to store the checkpoints of the pretrained model MAE')  
+  parser.add_argument('load_from_C_config', help='path to store the config of the pretrained model ConvNeXt')
+  parser.add_argument('load_from_checkpoint_C', help='path to store the checkpoints of the pretrained model ConvNeXt')
+  parser.add_argument('load_from_S_config', help='path to store the config of the pretrained model SegFormer')
+  parser.add_argument('load_from_checkpoint_S', help='path to store the checkpoints of the pretrained model SegFormer')
+  parser.add_argument('output_data_dir', help='output path of test segmentation results')
+  parser.add_argument(
+        '--device', default='cuda:0', help='Device used for inference')
+  args = parser.parse_args()
+ 
+  M = init_segmentor(args.load_from_M_config, args.load_from_checkpoint_M,  device='cuda:0')
+  C = init_segmentor(args.load_from_C_config, args.load_from_checkpoint_C,  device='cuda:0')
+  S = init_segmentor(args.load_from_S_config, args.load_from_checkpoint_S,  device='cuda:0')
 
   image_size_1 = 1024
   image_size_2 = 1536
 
-  test_data_dir = './DRAC2022_dataset/Test_Data/'
+  test_data_dir = './DRAC2022_dataset/Test_Data/1536/'
+  test_data_dir_ = './DRAC2022_dataset/Test_Data/1024/'
 
   test_data_dir_1 = test_data_dir + 'Original_Images/'
   test_data_dir_2 = test_data_dir + 'Horizontal_flip/'
@@ -85,36 +59,13 @@ def main():
   test_data_dir_5 = test_data_dir + 'R180/'
   test_data_dir_6 = test_data_dir + 'R270/'
 
-  # Intraretinal_microvascular_abnormals_Mask_1series = {}
-  # Intraretinal_microvascular_abnormals_Mask_1series_ = {}
-  # Neovascularization_Mask_1series = {}
-  # Neovascularization_Mask_1series_ = {}
-
-  # Intraretinal_microvascular_abnormals_Mask_2series = {}
-  # Intraretinal_microvascular_abnormals_Mask_2series_ = {}
-  # Neovascularization_Mask_2series = {}
-  # Neovascularization_Mask_2series_ = {}
-
-  # Intraretinal_microvascular_abnormals_Mask_3series = {}
-  # Intraretinal_microvascular_abnormals_Mask_3series_ = {}
-  # Neovascularization_Mask_3series = {}
-  # Neovascularization_Mask_3series_ = {}
-
-  # Intraretinal_microvascular_abnormals_Mask_4series = {}
-  # Intraretinal_microvascular_abnormals_Mask_4series_ = {}
-  # Neovascularization_Mask_4series = {}
-  # Neovascularization_Mask_4series_ = {}
-
-  # Intraretinal_microvascular_abnormals_Mask_5series = {}
-  # Intraretinal_microvascular_abnormals_Mask_5series_ = {}
-  # Neovascularization_Mask_5series = {}
-  # Neovascularization_Mask_5series_ = {}
-
-  # Intraretinal_microvascular_abnormals_Mask_6series = {}
-  # Intraretinal_microvascular_abnormals_Mask_6series_ = {}
-  # Neovascularization_Mask_6series = {}
-  # Neovascularization_Mask_6series_ = {}
-
+  test_data_dir_1_ = test_data_dir_ + 'Original_Images/'
+  test_data_dir_2_ = test_data_dir_ + 'Horizontal_flip/'
+  test_data_dir_3_ = test_data_dir_ + 'Vertical_flip/'
+  test_data_dir_4_ = test_data_dir_ + 'R90/'
+  test_data_dir_5_ = test_data_dir_ + 'R180/'
+  test_data_dir_6_ = test_data_dir_ + 'R270/'
+  
   Intraretinal_microvascular_abnormals_Mask_path = output_data_dir + '/Intraretinal_microvascular_abnormals_Mask'
   Intraretinal_microvascular_abnormals_Mask_path_folder = os.path.exists(Intraretinal_microvascular_abnormals_Mask_path)
   if not Intraretinal_microvascular_abnormals_Mask_path_folder:
@@ -139,6 +90,8 @@ def main():
     result_1 = inference_segmentor(M, image_file_1)
     result_2 = inference_segmentor(C, image_file_1)
     result_3 = inference_segmentor(S, image_file_1)
+    
+    result_3_ = inference_segmentor(S, image_file_1_)
 
     for i in range(image_size_2):
       for j in range(image_size_2):
@@ -152,11 +105,11 @@ def main():
 
     for i in range(image_size_1):
       for j in range(image_size_1):
-        if result_3[0][i][j] == 1:
+        if result_3_[0][i][j] == 1:
           Intraretinal_microvascular_abnormals_Mask_1_[i][j] = 25
-        elif result_3[0][i][j] == 2:
+        elif result_3_[0][i][j] == 2:
           Neovascularization_Mask_1_[i][j] = 25
-        elif result_3[0][i][j] == 3:
+        elif result_3_[0][i][j] == 3:
           Intraretinal_microvascular_abnormals_Mask_1_[i][j] = 25
           Neovascularization_Mask_1_[i][j] = 25
 
