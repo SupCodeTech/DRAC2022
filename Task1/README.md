@@ -37,7 +37,7 @@ In order to save time, we provide the model weights for MAE pre-training, as sho
       <td>32</td>
       <td> - </td>
       <td> - </td>
-      <td><a href='https://drive.google.com/file/d/1BRdnO5p1MTjkqk0QgxowAwtLJOvVZnwU/view?usp=sharing'>config</a> | <a href='https://drive.google.com/file/d/1-fvPtN05noOGP5CFfdleTQjUBAvej-7J/view?usp=share_link'>model</a> | log</td>
+      <td><a href='https://drive.google.com/file/d/1BRdnO5p1MTjkqk0QgxowAwtLJOvVZnwU/view?usp=sharing'>config</a> | <a href='https://drive.google.com/file/d/1-6Az5D8Bh8QnWk-S2-Es1i1MlmPVUtBH/view?usp=share_link'>model</a> | log</td>
       <td>  config | model  |log </td>
       <td>config| model |log</td>
 	</tr>
