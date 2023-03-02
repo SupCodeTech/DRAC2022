@@ -310,7 +310,7 @@ For the tests of Mask A and B, we provide the test file `MCS_DRNet_Task_1_Mask_A
 
 For mask A, usage:
 ```shell
-python tools/MCS_DRNet_Task_1_Mask_A_1536x1536.py ${load_from_M_config} ${load_from_checkpoint_M} ${load_from_C_config} ${load_from_checkpoint_C} ${load_from_S_config} ${load_from_checkpoint_S} 
+python tools/MCS_DRNet_Task_1_Mask_A.py ${load_from_M_config} ${load_from_checkpoint_M} ${load_from_C_config} ${load_from_checkpoint_C} ${load_from_S_config} ${load_from_checkpoint_S} 
 ```
 For mask B, usage:
 ```shell
