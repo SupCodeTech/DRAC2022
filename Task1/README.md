@@ -45,6 +45,14 @@ In order to save time, we provide the model weights for MAE pre-training, as sho
 </tbody>
 </table>
 
+Note: please place the weight of the model in this directory:
+```none
+├── 
+│   ├── work_dirs
+│   │   ├── mae_vit-base-p16-1600e_drac2022
+│   │   │   ├── epoch_1600.pth
+```
+
 ## Models Training
 
 If you want to do pre-training yourself, you can follow the steps below.
@@ -99,7 +107,7 @@ python tools/train.py configs/selfsup/mae/mae_vit-base-p16-1600e_drac2022.py
 After the above statement runs, the pre-trained MAE model will be saved in the following directory:
 
 ```none
-├── Se_sup
+├── 
 │   ├── work_dirs
 │   │   ├── mae_vit-base-p16-1600e_drac2022
 │   │   │   ├── epoch_1600.pth
