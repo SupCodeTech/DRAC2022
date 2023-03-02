@@ -311,11 +311,11 @@ For the tests of Mask A and B, we provide the test file `MCS_DRNet_Task_1_Mask_A
 
 For mask A, usage:
 ```shell
-python tools/MCS_DRNet_Task_1_Mask_A_1536x1536.py ${M_file_dir} ${C_file_dir} ${S_file_dir} ${Output_file_dir} 
+python tools/MCS_DRNet_Task_1_Mask_A_1536x1536.py ${load_from_checkpoint_M} ${load_from_checkpoint_C} ${load_from_checkpoint_S} ${output_data_dir} 
 ```
 For mask B, usage:
 ```shell
-python tools/MCS_DRNet_Task_1_Mask_B_1536x1536.py ${M_file_dir} ${C_file_dir} ${S_file_dir} ${Output_file_dir} 
+python tools/MCS_DRNet_Task_1_Mask_B_1536x1536.py ${load_from_checkpoint_M} ${load_from_checkpoint_C} ${load_from_checkpoint_S} ${output_data_dir} 
 ```
 `load_from_checkpoint_M`: path to store checkpoints of the pretrained model MAE \
 `load_from_checkpoint_C`: path to store the checkpoints of the pretrained model ConvNeXt \
