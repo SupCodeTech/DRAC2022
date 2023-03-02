@@ -6,11 +6,11 @@ _base_ = [
 ]
 
 # dataset
-data = dict(samples_per_gpu=32, workers_per_gpu=4)
+data = dict(samples_per_gpu=32, workers_per_gpu=8)
 
 # optimizer
 optimizer = dict(
-    lr=1.5e-4,
+    lr=1.5e-7,
     paramwise_options={
         'ln': dict(weight_decay=0.),
         'bias': dict(weight_decay=0.),
@@ -26,7 +26,7 @@ lr_config = dict(
     min_lr=0.0,
     warmup='linear',
     warmup_iters=40,
-    warmup_ratio=1e-4,
+    warmup_ratio=1e-7,
     warmup_by_epoch=True,
     by_epoch=False)
 
@@ -37,6 +37,6 @@ runner = dict(max_epochs=1600)
 checkpoint_config = dict(interval=400, max_keep_ckpts=4, out_dir='')
 persistent_workers = True
 log_config = dict(
-    interval=100, hooks=[
+    interval=50, hooks=[
         dict(type='TextLoggerHook'),
     ])
