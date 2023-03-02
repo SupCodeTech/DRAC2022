@@ -90,7 +90,6 @@ def main():
     result_1 = inference_segmentor(M, image_file_1)
     result_2 = inference_segmentor(C, image_file_1)
     result_3 = inference_segmentor(S, image_file_1)
-    
     result_3_ = inference_segmentor(S, image_file_1_)
 
     for i in range(image_size_2):
@@ -113,11 +112,6 @@ def main():
           Intraretinal_microvascular_abnormals_Mask_1_[i][j] = 25
           Neovascularization_Mask_1_[i][j] = 25
 
-    # Intraretinal_microvascular_abnormals_Mask_1series[file] = Intraretinal_microvascular_abnormals_Mask_1
-    # Intraretinal_microvascular_abnormals_Mask_1series_[file] = Intraretinal_microvascular_abnormals_Mask_1_
-    # Neovascularization_Mask_1series[file] = Neovascularization_Mask_1
-    # Neovascularization_Mask_1series_[file] = Neovascularization_Mask_1_
-
     image_file_2 = os.path.join(test_data_dir_2 + file)
 
     Intraretinal_microvascular_abnormals_Mask_2 = np.zeros(2359296).reshape((image_size_2, image_size_2)) 
@@ -126,11 +120,11 @@ def main():
     Intraretinal_microvascular_abnormals_Mask_2_ = np.zeros(1048576).reshape((image_size_1, image_size_1)) 
     Neovascularization_Mask_2_ = np.zeros(1048576).reshape((image_size_1, image_size_1))
 
-
     result_1 = inference_segmentor(M, image_file_2)
     result_2 = inference_segmentor(C, image_file_2)
     result_3 = inference_segmentor(S, image_file_2)
-
+    result_3_ = inference_segmentor(S, image_file_2_)
+    
     for i in range(image_size_2):
       for j in range(image_size_2):
         if (result_1[0][i][j] == 1) or (result_2[0][i][j] == 1) or (result_3[0][i][j] == 1):
@@ -143,19 +137,14 @@ def main():
 
     for i in range(image_size_1):
       for j in range(image_size_1):
-        if result_3[0][i][j] == 1:
+        if result_3_[0][i][j] == 1:
           Intraretinal_microvascular_abnormals_Mask_2_[i][j] = 25
-        elif result_3[0][i][j] == 2:
+        elif result_3_[0][i][j] == 2:
           Neovascularization_Mask_2_[i][j] = 25
-        elif result_3[0][i][j] == 3:
+        elif result_3_[0][i][j] == 3:
           Intraretinal_microvascular_abnormals_Mask_2_[i][j] = 25
           Neovascularization_Mask_2_[i][j] = 25  
 
-    # Intraretinal_microvascular_abnormals_Mask_2series[file] = Intraretinal_microvascular_abnormals_Mask_2
-    # Intraretinal_microvascular_abnormals_Mask_2series_[file] = Intraretinal_microvascular_abnormals_Mask_2_
-    # Neovascularization_Mask_2series[file] = Neovascularization_Mask_2
-    # Neovascularization_Mask_2series_[file] = Neovascularization_Mask_2_
-    
     image_file_3 = os.path.join(test_data_dir_3 + file)
 
     Intraretinal_microvascular_abnormals_Mask_3 = np.zeros(2359296).reshape((image_size_2, image_size_2)) 
@@ -164,11 +153,11 @@ def main():
     Intraretinal_microvascular_abnormals_Mask_3_ = np.zeros(1048576).reshape((image_size_1, image_size_1)) 
     Neovascularization_Mask_3_ = np.zeros(1048576).reshape((image_size_1, image_size_1))
 
-
     result_1 = inference_segmentor(M, image_file_3)
     result_2 = inference_segmentor(C, image_file_3)
     result_3 = inference_segmentor(S, image_file_3)
-
+    result_3_ = inference_segmentor(S, image_file_3_)
+    
     for i in range(image_size_2):
       for j in range(image_size_2):
         if (result_1[0][i][j] == 1) or (result_2[0][i][j] == 1) or (result_3[0][i][j] == 1):
@@ -181,18 +170,13 @@ def main():
 
     for i in range(image_size_1):
       for j in range(image_size_1):
-        if result_3[0][i][j] == 1:
+        if result_3_[0][i][j] == 1:
           Intraretinal_microvascular_abnormals_Mask_3_[i][j] = 25
-        elif result_3[0][i][j] == 2:
+        elif result_3_[0][i][j] == 2:
           Neovascularization_Mask_3_[i][j] = 25
-        elif result_3[0][i][j] == 3:
+        elif result_3_[0][i][j] == 3:
           Intraretinal_microvascular_abnormals_Mask_3_[i][j] = 25
           Neovascularization_Mask_3_[i][j] = 25  
-
-    # Intraretinal_microvascular_abnormals_Mask_3series[file] = Intraretinal_microvascular_abnormals_Mask_3
-    # Intraretinal_microvascular_abnormals_Mask_3series_[file] = Intraretinal_microvascular_abnormals_Mask_3_
-    # Neovascularization_Mask_3series[file] = Neovascularization_Mask_3
-    # Neovascularization_Mask_3series_[file] = Neovascularization_Mask_3_
 
     image_file_4 = os.path.join(test_data_dir_4 + file)
 
@@ -202,10 +186,10 @@ def main():
     Intraretinal_microvascular_abnormals_Mask_4_ = np.zeros(1048576).reshape((image_size_1, image_size_1)) 
     Neovascularization_Mask_4_ = np.zeros(1048576).reshape((image_size_1, image_size_1))
 
-
     result_1 = inference_segmentor(M, image_file_4)
     result_2 = inference_segmentor(C, image_file_4)
     result_3 = inference_segmentor(S, image_file_4)
+    result_3_ = inference_segmentor(S, image_file_4_)
 
     for i in range(image_size_2):
       for j in range(image_size_2):
@@ -219,19 +203,13 @@ def main():
 
     for i in range(image_size_1):
       for j in range(image_size_1):
-        if result_3[0][i][j] == 1:
+        if result_3_[0][i][j] == 1:
           Intraretinal_microvascular_abnormals_Mask_4_[i][j] = 25
-        elif result_3[0][i][j] == 2:
+        elif result_3_[0][i][j] == 2:
           Neovascularization_Mask_4_[i][j] = 25
-        elif result_3[0][i][j] == 3:
+        elif result_3_[0][i][j] == 3:
           Intraretinal_microvascular_abnormals_Mask_4_[i][j] = 25
           Neovascularization_Mask_4_[i][j] = 25  
-
-
-    # Intraretinal_microvascular_abnormals_Mask_4series[file] = Intraretinal_microvascular_abnormals_Mask_4
-    # Intraretinal_microvascular_abnormals_Mask_4series_[file] = Intraretinal_microvascular_abnormals_Mask_4_
-    # Neovascularization_Mask_4series[file] = Neovascularization_Mask_4
-    # Neovascularization_Mask_4series_[file] = Neovascularization_Mask_4_
 
     image_file_5 = os.path.join(test_data_dir_5 + file)
 
@@ -240,12 +218,12 @@ def main():
 
     Intraretinal_microvascular_abnormals_Mask_5_ = np.zeros(1048576).reshape((image_size_1, image_size_1)) 
     Neovascularization_Mask_5_ = np.zeros(1048576).reshape((image_size_1, image_size_1))
-
-
+    
     result_1 = inference_segmentor(M, image_file_5)
     result_2 = inference_segmentor(C, image_file_5)
     result_3 = inference_segmentor(S, image_file_5)
-
+    result_3_ = inference_segmentor(S, image_file_5_)
+    
     for i in range(image_size_2):
       for j in range(image_size_2):
         if (result_1[0][i][j] == 1) or (result_2[0][i][j] == 1) or (result_3[0][i][j] == 1):
@@ -258,11 +236,11 @@ def main():
 
     for i in range(image_size_1):
       for j in range(image_size_1):
-        if result_3[0][i][j] == 1:
+        if result_3_[0][i][j] == 1:
           Intraretinal_microvascular_abnormals_Mask_5_[i][j] = 25
-        elif result_3[0][i][j] == 2:
+        elif result_3_[0][i][j] == 2:
           Neovascularization_Mask_5_[i][j] = 25
-        elif result_3[0][i][j] == 3:
+        elif result_3_[0][i][j] == 3:
           Intraretinal_microvascular_abnormals_Mask_5_[i][j] = 25
           Neovascularization_Mask_5_[i][j] = 25 
 
@@ -277,7 +255,8 @@ def main():
     result_1 = inference_segmentor(M, image_file_6)
     result_2 = inference_segmentor(C, image_file_6)
     result_3 = inference_segmentor(S, image_file_6)
-
+    result_3_ = inference_segmentor(S, image_file_6_)
+    
     for i in range(image_size_2):
       for j in range(image_size_2):
         if (result_1[0][i][j] == 1) or (result_2[0][i][j] == 1) or (result_3[0][i][j] == 1):
@@ -290,11 +269,11 @@ def main():
 
     for i in range(image_size_1):
       for j in range(image_size_1):
-        if result_3[0][i][j] == 1:
+        if result_3_[0][i][j] == 1:
           Intraretinal_microvascular_abnormals_Mask_6_[i][j] = 25
-        elif result_3[0][i][j] == 2:
+        elif result_3_[0][i][j] == 2:
           Neovascularization_Mask_6_[i][j] = 25
-        elif result_3[0][i][j] == 3:
+        elif result_3_[0][i][j] == 3:
           Intraretinal_microvascular_abnormals_Mask_6_[i][j] = 25
           Neovascularization_Mask_6_[i][j] = 25
 
