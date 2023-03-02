@@ -47,7 +47,7 @@ In order to save time, we provide the model weights for MAE pre-training, as sho
 
 Note: please place the weight of the model in this directory:
 ```none
-├── 
+├── mmselfsup-0.11.0
 │   ├── work_dirs
 │   │   ├── mae_vit-base-p16-1600e_drac2022
 │   │   │   ├── epoch_1600.pth
@@ -71,7 +71,7 @@ Note: please configure the lab environment before proceeding to the following st
 Then, download the DRAC Task 3 dataset and unzip it. Save the data in the following directory:
 
 ```none
-├── Se_sup
+├── mmselfsup-0.11.0
 │   ├── C._Diabetic_Retinopathy_Grading
 │   │   ├── 1._Original_Images
 │   │   │   ├── a._Training_Set
@@ -89,7 +89,7 @@ python tools/pretrain_data_processing.py
 the processing data will be saved in the following directory:
 
 ```none
-├── Se_sup
+├── mmselfsup-0.11.0
 │   ├── Data
 │   │   ├── Original_Images
 │   │   │   ├── Training_Set
@@ -107,7 +107,7 @@ python tools/train.py configs/selfsup/mae/mae_vit-base-p16-1600e_drac2022.py
 After the above statement runs, the pre-trained MAE model will be saved in the following directory:
 
 ```none
-├── 
+├── mmselfsup-0.11.0
 │   ├── work_dirs
 │   │   ├── mae_vit-base-p16-1600e_drac2022
 │   │   │   ├── epoch_1600.pth
@@ -122,7 +122,7 @@ python tools/model_converters/extract_backbone_weights.py work_dirs/mae/epoch_16
 After running, the model is saved in the following directory：
 
 ```none
-├── Se_sup
+├── mmselfsup-0.11.0
 │   ├── work_dirs
 │   │   ├── mae
 │   │   │   ├── pretrain_backbone_1600.pth
