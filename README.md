@@ -6,6 +6,18 @@ Papers accepted by the [25th International Conference on Medical Image Computing
 
 `For Task 1 and 3`: Semi-Supervised Semantic Segmentation Methods for UW-OCTA Diabetic Retinopathy Grade Assessment 
 
+
+The methods (MCSDR-Net v1) constructed by my team (Galactic Fleet) was placed 7th (0,5161 mDice) in the DRAC2022 Semantic Segmentation (Task1) challenge.
+
+![image](https://user-images.githubusercontent.com/111235455/222426224-81e1d41b-7aab-48f9-9cac-628bcab4fb9c.png)
+
+After the challenge, we improved the built model  (MCSDR-Net v1)  and proposed a second version  (MCSDR-Net v2) , which has greatly improved the accuracy of the model, reaching 0.5544 mDice.
+
+![image](https://user-images.githubusercontent.com/111235455/222428329-19ad2d5c-c821-496b-8019-237ec3c1ea15.png)
+
+The code is based on [MMSelfsup v0.11.0](https://github.com/open-mmlab/mmselfsup/tree/v0.11.0) and [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmsegmentation/tree/v0.24.1).
+
+
 `For Task 2`: Image Quality Assessment based on Multi-Model Ensemble Class-Imbalance Repair Algorithm for Diabetic Retinopathy UW-OCTA Images 
 
 If our work is helpful to you, please cite the following papers:
