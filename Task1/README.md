@@ -49,8 +49,8 @@ Note: please place the weight of the model in this directory:
 ```none
 ├── mmselfsup-0.11.0
 │   ├── work_dirs
-│   │   ├── mae_vit-base-p16-1600e_drac2022
-│   │   │   ├── epoch_1600.pth
+│   │   ├── mae
+│   │   │   ├── pretrain_backbone_1600.pth
 ```
 
 ## Models Training
