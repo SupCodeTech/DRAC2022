@@ -14,8 +14,6 @@ After the challenge, we improved the built model  (MCSDR-Net v1)  and proposed a
 
 ![image](https://user-images.githubusercontent.com/111235455/222428329-19ad2d5c-c821-496b-8019-237ec3c1ea15.png)
 
-The code is based on [MMSelfsup v0.11.0](https://github.com/open-mmlab/mmselfsup/tree/v0.11.0) and [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmsegmentation/tree/v0.24.1).
-
 
 `For Task 2`: Image Quality Assessment based on Multi-Model Ensemble Class-Imbalance Repair Algorithm for Diabetic Retinopathy UW-OCTA Images 
 
