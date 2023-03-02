@@ -315,10 +315,12 @@ python tools/MCS_DRNet_Task_1_Mask_A_1536x1536.py ${load_from_checkpoint_M} ${lo
 ```
 For mask B, usage:
 ```shell
-python tools/MCS_DRNet_Task_1_Mask_B_1536x1536.py ${load_from_checkpoint_M} ${load_from_checkpoint_C} ${load_from_checkpoint_S} ${output_data_dir} 
+python tools/MCS_DRNet_Task_1_Mask_B_1536x1536.py ${load_from_C_config} ${load_from_checkpoint_C} ${output_data_dir} 
 ```
+
 `load_from_checkpoint_M`: path to store checkpoints of the pretrained model MAE \
 `load_from_checkpoint_C`: path to store the checkpoints of the pretrained model ConvNeXt \
+`load_from_C_config`: path to store the config of the pretrained model ConvNeXt \
 `load_from_checkpoint_S`: path to store checkpoints of the pretrained model SegFormer \
 `output_data_dir`: output path of test segmentation results
 
