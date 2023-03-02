@@ -7,6 +7,48 @@
 The code is based on [MMSelfsup v0.11.0](https://github.com/open-mmlab/mmselfsup/tree/v0.11.0) and [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmsegmentation/tree/v0.24.1).
 # Stage I: Pre-task training
 
+## Models and Benchmarks
+
+In order to save time, we provide the model weights for MAE pre-training, as shown in the following table:
+
+<table class="docutils">
+<thead>
+  <tr>
+	    <th rowspan="2">Algorithm</th>
+	    <th rowspan="2">Backbone</th>
+	    <th rowspan="2">Epoch</th>
+      <th rowspan="2">Batch Size</th>
+      <th colspan="2" align="center">Results (Top-1 %)</th>
+      <th colspan="3" align="center">Links</th>
+	</tr>
+	<tr>
+      <th>Linear Eval</th>
+      <th>Fine-tuning</th>
+      <th>Pretrain</th>
+      <th>Linear Eval</th>
+      <th>Fine-tuning</th>
+	</tr>
+  </thead>
+  <tbody>
+  <tr>
+      <td rowspan="9">MAE</td>
+	    <td>ViT-base</td>
+	    <td>1600</td>
+      <td>32</td>
+      <td> - </td>
+      <td> - </td>
+      <td><a href='https://drive.google.com/file/d/1BRdnO5p1MTjkqk0QgxowAwtLJOvVZnwU/view?usp=sharing'>config</a> | <a href='https://drive.google.com/file/d/1-fvPtN05noOGP5CFfdleTQjUBAvej-7J/view?usp=share_link'>model</a> | log</td>
+      <td>  config | model  |log </td>
+      <td>config| model |log</td>
+	</tr>
+  
+</tbody>
+</table>
+
+## Models Training
+
+If you want to do pre-training yourself, you can follow the steps below.
+
 The pre-training environment is configured as follows:
 ```shell
 pip install torch==1.12.0 torchvision --extra-index-url https://download.pytorch.org/whl/cu113
