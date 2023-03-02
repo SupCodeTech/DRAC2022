@@ -4,7 +4,6 @@
 
 <!-- [ABSTRACT] -->
 
-The code is based on [MMSelfsup v0.11.0](https://github.com/open-mmlab/mmselfsup/tree/v0.11.0) and [MMSegmentaion v0.24.1](https://github.com/open-mmlab/mmsegmentation/tree/v0.24.1).
 # Stage I: Pre-task training
 
 ## Models and Benchmarks
