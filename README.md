@@ -1,6 +1,5 @@
 # Diabetic Retinopathy Analysis Challenge 2022 (DRAC2022)
 
-`Task 2 and 3 are still under construction. Please stay tuned.` 
 
 Papers accepted by the [25th International Conference on Medical Image Computing and Computer Assisted Intervention](https://conferences.miccai.org/2022/en/) (MICCAI2022):
 
