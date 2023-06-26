@@ -181,3 +181,5 @@ for file in mmcv.scandir(img_dir, suffix='.png'):
   # rotate 270 640 raw image saving
   image_640_270 = Original_image_640.rotate(270, expand=1)
   image_640_270.save(osp.join("./DRAC2022_dataset/Segmentation/Training/A/640/Original_images", "2709" +file.replace('.png','.jpg')))
+if __name__ == '__main__':
+    main()
