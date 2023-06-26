@@ -418,3 +418,6 @@ def main():
 
     Neovascularization_Mask = Image.fromarray(Neovascularization_Mask).convert('P')
     Neovascularization_Mask.save(osp.join(Neovascularization_Mask_path, file))
+
+if __name__ == '__main__':
+    main()
