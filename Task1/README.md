@@ -6,7 +6,7 @@ The code is based on [MMSelfsup v0.11.0](https://github.com/open-mmlab/mmselfsup
 
 # Stage I: Pre-task training
 
-## Models and Benchmarks
+## Models and BenchmarksS
 
 In order to save time, we provide the model weights for MAE pre-training, as shown in the following table:
 
